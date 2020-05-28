@@ -1,4 +1,4 @@
-package objects;
+package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.junit.jupiter.api.Test;
+
+import objects.HomeFile;
 
 class HomeFileTest 
 {
