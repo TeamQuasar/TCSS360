@@ -9,6 +9,10 @@ import info.UserSettings;
 
 class UserTest {
 
+	/**
+	 * Test parameterized user constructor
+	 * @author Collin Nguyen
+	 */
 	@Test
 	void testUserStringStringBoolean() {
 		User user = new User("Test", "Pass", true);
@@ -16,6 +20,10 @@ class UserTest {
 		assertTrue(user.getAdminStat());
 	}
 
+	/**
+	 * Test default user constructor
+	 * @author Collin Nguyen
+	 */
 	@Test
 	void testUserStringString() {
 		User user = new User("Test", "Pass");
@@ -23,6 +31,10 @@ class UserTest {
 		assertFalse(user.getAdminStat());
 	}
 
+	/**
+	 * Test getter for admin status
+	 * @author Collin Nguyen
+	 */
 	@Test
 	void testGetAdminStat() {
 		User user1 = new User("Test", "Pass");
@@ -31,6 +43,10 @@ class UserTest {
 		assertFalse(user1.getAdminStat());
 	}
 
+	/**
+	 * Test credential verification
+	 * @author Collin Nguyen
+	 */
 	@Test
 	void testVerifyCredentials() {
 		User user = new User("Test", "Pass");
@@ -40,10 +56,16 @@ class UserTest {
 		assertFalse(user.verifyCredentials("Test", "notPass"));
 	}
 
-//	Not implemented yet.
-//	@Test
-//	void testGetSettings() {
-//		
-//	}
+	/**
+	 * Test getter for user settings
+	 * @author Collin Nguyen
+	 */
+	@Test
+	void testGetSettings() {
+		UserSettings userSetting = new UserSettings("Name", "Email");
+		User user = new User("Test", "Pass");
+		user.setSettings(userSetting);
+		assertNotNull(user.getSettings());
+	}
 
 }
