@@ -50,6 +50,11 @@ public class Login extends JFrame {
 	final JButton loginButton = new JButton("Log In");
 	
 	/**
+	 * Set this to true to bypass login screen and go straight to the main GUI.
+	 */
+	private boolean debug = true;
+	
+	/**
 	 * Parameterless constructor
 	 */
 	public Login() {
@@ -63,15 +68,25 @@ public class Login extends JFrame {
 	 * @author Collin Nguyen
 	 */
 	public void start() throws IOException {
-		myFrame = new Login();
-		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		myFrame.setLayout(new BorderLayout());
+		if (!debug) {
+			myFrame = new Login();
+			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			myFrame.setLayout(new BorderLayout());
 		
-		myFrame.add(createMainPanel());
+			myFrame.add(createMainPanel());
 		
-		myFrame.pack();
-		myFrame.setVisible(true);
-		myFrame.setLocationRelativeTo(null);
+			myFrame.pack();
+			myFrame.setVisible(true);
+			myFrame.setLocationRelativeTo(null);
+		} else {
+			GUI mainGUI = new GUI();
+			try {
+				mainGUI.start(myManager);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				loginButton.setEnabled(true);
+			}
+		}
 	}
 	
 	/**
