@@ -55,4 +55,9 @@ public class Room {
 			myFiles.add(theFile);
 		}
 		
+		@Override
+		public String toString() {
+			return myRoomName;
+		}
+		
 }

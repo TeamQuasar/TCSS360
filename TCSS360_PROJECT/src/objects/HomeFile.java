@@ -117,4 +117,10 @@ public class HomeFile
 	{
 		myFileName = theNewFileName;
 	}
+	
+	@Override
+	public String toString() {
+		return myFileName;
+	}
+	
 }
