@@ -149,7 +149,6 @@ public class GUI extends JFrame{
 		top.setMaximumSize(new Dimension(194, 50));
 		
 		JComboBox<Room> roomBox = new JComboBox<>();
-		roomBox.addItem(new Room("Living Room"));
 		top.add(roomBox);
 		
 		JTextArea searchBar = new JTextArea("Search");
@@ -158,15 +157,48 @@ public class GUI extends JFrame{
 		top.add(searchBar);
 		
 		DefaultListModel<HomeFile> listModel = new DefaultListModel<>();
-		listModel.addElement(new HomeFile("Appliance 1"));
-		listModel.addElement(new HomeFile("Appliance 2"));
-		listModel.addElement(new HomeFile("Appliance 3"));
-		listModel.addElement(new HomeFile("Appliance 4"));
 		JList fileList = new JList<HomeFile>(listModel);
 		fileList.setMaximumSize(new Dimension(194, 500));
 		middle.add(fileList);
 		
 		bottom = generateInfoPanel();
+		
+		// For testing purposes
+		
+		Room bedroom = new Room("Bedroom");
+		Room kitchen = new Room("Kitchen");
+		
+		bedroom.addFile(new HomeFile("Bed"));
+		bedroom.addFile(new HomeFile("Dresser"));
+		bedroom.addFile(new HomeFile("Lamp"));
+		
+		kitchen.addFile(new HomeFile("Stove"));
+		kitchen.addFile(new HomeFile("Fridge"));
+		kitchen.addFile(new HomeFile("Microwave"));
+		kitchen.addFile(new HomeFile("Banana"));
+		
+		roomBox.addItem(bedroom);
+		roomBox.addItem(kitchen);
+		
+		roomBox.setSelectedIndex(0);
+        for (HomeFile h : bedroom.getFiles()) {
+        	listModel.addElement(h);
+        }
+		
+		// End
+		
+		roomBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox<?> box = (JComboBox<?>) e.getSource();
+		        Room room = (Room) box.getSelectedItem();
+		        listModel.removeAllElements();
+		        for (HomeFile h : room.getFiles()) {
+		        	listModel.addElement(h);
+		        }
+			}
+			
+        });
 		
 		panel.add(top);
 		panel.add(Box.createRigidArea(new Dimension(0, 10)));
