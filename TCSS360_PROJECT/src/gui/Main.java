@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.swing.UIManager;
 
+import objects.User;
+
 /**
  * Homeowner's Manual PRO main class. Starts gui.
  * 

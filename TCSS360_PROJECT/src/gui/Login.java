@@ -21,6 +21,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import objects.AccountManager;
+
 /**
  * Homeowner's Manual PRO Login GUI
  * 
@@ -35,6 +37,11 @@ public class Login extends JFrame {
 	private static final long serialVersionUID = -4328079188596764858L;
 
 	/**
+	 * Account manager for the program
+	 */
+	AccountManager myManager;
+	
+	/**
 	 * Main JFrame
 	 */
 	private Login myFrame;
@@ -44,6 +51,7 @@ public class Login extends JFrame {
 	 */
 	public Login() {
 		super("HMP - Log in");
+		myManager = new AccountManager();
 	}
 
 	/**
@@ -132,10 +140,10 @@ public class Login extends JFrame {
 	 * @author Collin Nguyen
 	 */
 	private void login(final String username, final String password) {
-		if (true) {
+		if (myManager.enterCredentials(username, password)) {
 			GUI mainGUI = new GUI();
 			try {
-				mainGUI.start();
+				mainGUI.start(myManager);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -154,7 +162,7 @@ public class Login extends JFrame {
 	 * @author Collin Nguyen
 	 */
 	private void create(final String username, final String password) {
-		if (true) {
+		if (myManager.createAccount(username, password)) {
 			JOptionPane.showMessageDialog(myFrame,
 					"Account Created!",
 					"Success", 

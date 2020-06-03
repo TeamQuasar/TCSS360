@@ -1,5 +1,6 @@
 package objects;
 
+import java.io.Serializable;
 import info.UserSettings;
 
 /**
@@ -7,8 +8,13 @@ import info.UserSettings;
  * @author Romi Tshiorny
  *
  */
-public class User {
+public class User implements Serializable{
 	
+	/**
+	 * Generated serialVersion ID
+	 */
+	private static final long serialVersionUID = 1348706745575000814L;
+
 	/**
 	 * Boolean for if the user is an admin or not
 	 */
@@ -70,7 +76,7 @@ public class User {
 	 * @return True if the username and password match the user
 	 */
 	public boolean verifyCredentials(String enteredUsername, String enteredPassword) {
-		return (myUsername == enteredUsername) && (myPassword == enteredPassword);
+		return (myUsername.equals(enteredUsername)) && (myPassword.equals(enteredPassword));
 	}
 	
 	/**
@@ -91,4 +97,14 @@ public class User {
 	public void setSettings(UserSettings settings) {
 		mySettings = settings;
 	}
+	
+	/**
+	 * Getter for myUsername
+	 * @author Romi Tshiorny
+	 * @return the Username
+	 */
+	public String getUsername() {
+		return myUsername;
+	}
+	
 }

@@ -24,6 +24,7 @@ public class HomeFile
 	
 	/**
 	 * Constructor for creating a new file.
+	 * @author Idris Istanbul
 	 *  
 	 * @param theFileName - The name of the new file.
 	 * @param theUserNotes - Notes for the new file.
@@ -43,7 +44,18 @@ public class HomeFile
 	}
 	
 	/**
+	 * Constructor for creating a File without notes by default
+	 * @author Romi Tshiorny
+	 * 
+	 * @param theFileName The name of the new file.
+	 */
+	public HomeFile(final String theFileName) {
+		this(theFileName, "");
+	}
+	
+	/**
 	 * Method to append notes to the current file notes fixture.
+	 * @author Idris Istanbul
 	 * 
 	 * @param theNote - The note to add.
 	 */
@@ -55,6 +67,7 @@ public class HomeFile
 	
 	/**
 	 * Method to clear out all notes for the file.
+	 * @author Idris Istanbul
 	 */
 	public void clearNotes()
 	{
@@ -63,6 +76,7 @@ public class HomeFile
 	
 	/**
 	 * Getter for file name.
+	 * @author Idris Istanbul
 	 * 
 	 * @return myFileName - The file name fixture.
 	 */
@@ -73,6 +87,7 @@ public class HomeFile
 	
 	/**
 	 * Getter for file notes.
+	 * @author Idris Istanbul
 	 * 
 	 * @return myFileNotes - The file notes fixture.
 	 */
@@ -83,6 +98,7 @@ public class HomeFile
 	
 	/**
 	 * Getter for file import date.
+	 * @author Idris Istanbul
 	 * 
 	 * @return myImportDate - The file import date.
 	 */
@@ -93,6 +109,7 @@ public class HomeFile
 	
 	/**
 	 * This will replace the file name with a new one.
+	 * @author Idris Istanbul
 	 * 
 	 * @param theNewFileName - The new file name.
 	 */

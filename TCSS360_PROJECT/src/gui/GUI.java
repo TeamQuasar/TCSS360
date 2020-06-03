@@ -16,6 +16,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import info.About;
+import objects.AccountManager;
 
 /**
  * Homeowner's Manual PRO GUI class. Handles creation of GUI frame and elements.
@@ -30,6 +31,12 @@ public class GUI extends JFrame{
 	 */
 	private static final long serialVersionUID = -4328079188596764858L;
 
+	
+	/**
+	 * Account manager for the program
+	 */
+	AccountManager myManager;
+	
 	/**
 	 * Main JFrame
 	 */
@@ -51,7 +58,8 @@ public class GUI extends JFrame{
 	 * Start JFrame
 	 * @throws IOException 
 	 */
-	public void start() throws IOException {
+	public void start(AccountManager theManager) throws IOException {
+		myManager = theManager;
 		myFrame = new GUI();
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myFrame.setLayout(new BorderLayout());
