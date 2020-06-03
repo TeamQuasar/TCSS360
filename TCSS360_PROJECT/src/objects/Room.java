@@ -55,6 +55,10 @@ public class Room {
 			myFiles.add(theFile);
 		}
 		
+		/**
+		 * To String method
+		 * @author Collin Nguyen
+		 */
 		@Override
 		public String toString() {
 			return myRoomName;

@@ -118,6 +118,10 @@ public class HomeFile
 		myFileName = theNewFileName;
 	}
 	
+	/**
+	 * To String method
+	 * @author Collin Nguyen
+	 */
 	@Override
 	public String toString() {
 		return myFileName;
