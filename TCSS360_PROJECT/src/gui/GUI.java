@@ -27,7 +27,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -58,6 +61,29 @@ public class GUI extends JFrame{
 	 * Main JFrame
 	 */
 	private GUI myFrame;	
+	
+	/**
+	 * Holds file list elements
+	 */
+	private DefaultListModel<HomeFile> listModel = new DefaultListModel<>();
+	
+	/**
+	 * The currently selected room
+	 */
+	private Room myRoom;
+	
+	/**
+	 * The currently selected file
+	 */
+	private HomeFile myFile;
+	
+	private JTextField titleArea;
+	
+	private JTextArea createdArea;
+	
+	private JComboBox<String> permissionsBox;
+	
+	private JTextArea notesArea;
 	
 	/**
 	 * Parameterless constructor
@@ -156,7 +182,6 @@ public class GUI extends JFrame{
 		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		top.add(searchBar);
 		
-		DefaultListModel<HomeFile> listModel = new DefaultListModel<>();
 		JList fileList = new JList<HomeFile>(listModel);
 		fileList.setMaximumSize(new Dimension(194, 500));
 		middle.add(fileList);
@@ -190,14 +215,26 @@ public class GUI extends JFrame{
 		roomBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				fileList.clearSelection();
 				JComboBox<?> box = (JComboBox<?>) e.getSource();
-		        Room room = (Room) box.getSelectedItem();
-		        listModel.removeAllElements();
-		        for (HomeFile h : room.getFiles()) {
+		        myRoom = (Room) box.getSelectedItem();
+				listModel.removeAllElements();
+				for (HomeFile h : myRoom.getFiles()) {
 		        	listModel.addElement(h);
 		        }
 			}
 			
+        });
+		
+		fileList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				JList<?> list = (JList<?>) e.getSource();
+				if (!e.getValueIsAdjusting() && !roomBox.isFocusOwner() && !titleArea.isFocusOwner()) {
+	                	myFile = (HomeFile) list.getSelectedValue();
+	                	update();
+	                }
+			}
         });
 		
 		panel.add(top);
@@ -221,7 +258,7 @@ public class GUI extends JFrame{
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(294, 600));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		JTextArea notesArea = new JTextArea("NOTES");
+		notesArea = new JTextArea("NOTES");
 		notesArea.setPreferredSize(new Dimension(225, 400));
 		JButton saveButton = new JButton("Save");
 		saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -251,20 +288,31 @@ public class GUI extends JFrame{
 		panel.setMaximumSize(new Dimension(194, 180));
 		JLabel title = new JLabel("Name:");
 		title.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JTextArea titleArea = new JTextArea();
-		JLabel created = new JLabel("Created by:");
+		titleArea = new JTextField();
+		JLabel created = new JLabel("Imported on:");
 		created.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JTextArea createdArea = new JTextArea();
+		createdArea = new JTextArea();
 		createdArea.setEditable(false);
 		
 		JLabel permissions = new JLabel("Permissions");
 		permissions.setAlignmentX(Component.CENTER_ALIGNMENT);
 		String[] perms = {"Only Me", "Everyone can view", "Everyone can edit"};
-		JComboBox<String> permissionsBox = new JComboBox<>(perms);
+		permissionsBox = new JComboBox<>(perms);
 		
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setMaximumSize(new Dimension(194, 20));
 		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		// Buggy 
+		titleArea.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JTextField field = (JTextField) e.getSource();
+		        myFile.setNewFileName(field.getText());
+		        listModel.removeAllElements();
+		        System.out.println(myRoom.getFiles());
+			}
+        });
 		
 		panel.add(title);
 		panel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -281,6 +329,12 @@ public class GUI extends JFrame{
 		panel.add(deleteButton);
 		
 		return panel;
+	}
+	
+	private void update() {
+		titleArea.setText(myFile.toString());
+		createdArea.setText(myFile.getImportDate());
+		notesArea.setText(myFile.getFileNotes());
 	}
 	
 }
