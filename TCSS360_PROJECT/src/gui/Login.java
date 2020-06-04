@@ -52,7 +52,7 @@ public class Login extends JFrame {
 	/**
 	 * Set this to true to bypass login screen and go straight to the main GUI.
 	 */
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	/**
 	 * Parameterless constructor

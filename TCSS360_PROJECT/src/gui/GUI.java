@@ -25,6 +25,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
@@ -117,7 +118,9 @@ public class GUI extends JFrame{
 		fileMenu.add(exportItem);
 		
 		JMenuItem aboutItem = new JMenuItem("About");
+		JMenuItem userItem = new JMenuItem("Users");
 		optionsMenu.add(aboutItem);
+		optionsMenu.add(userItem);
 		
 		About aboutBox = new About();
 		
@@ -265,6 +268,15 @@ public class GUI extends JFrame{
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setMaximumSize(new Dimension(194, 20));
 		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				 String choiceButtons[] = {"Yes","No"};
+			        int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
+			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+			        //TODO
+			}			
+		});
 		
 		panel.add(title);
 		panel.add(Box.createRigidArea(new Dimension(0, 5)));
