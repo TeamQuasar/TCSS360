@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -59,6 +61,14 @@ public class GUI extends JFrame{
 	 * Main JFrame
 	 */
 	private GUI myFrame;	
+	
+	private HomeFile myFile;
+	
+	private DefaultListModel<HomeFile> listModel;
+	
+	private JTextArea titleArea;
+	
+	private JTextArea createdArea;
 	
 	/**
 	 * Parameterless constructor
@@ -159,7 +169,7 @@ public class GUI extends JFrame{
 		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		top.add(searchBar);
 		
-		DefaultListModel<HomeFile> listModel = new DefaultListModel<>();
+		listModel = new DefaultListModel<>();
 		JList fileList = new JList<HomeFile>(listModel);
 		fileList.setMaximumSize(new Dimension(194, 500));
 		middle.add(fileList);
@@ -200,7 +210,18 @@ public class GUI extends JFrame{
 		        	listModel.addElement(h);
 		        }
 			}
-			
+        });
+		
+		fileList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting() && !roomBox.isFocusOwner()) {
+						myFile = (HomeFile) fileList.getSelectedValue();
+						titleArea.setText(myFile.toString());
+						createdArea.setText(myFile.getImportDate());
+	                }
+				
+			}
         });
 		
 		panel.add(top);
@@ -254,10 +275,11 @@ public class GUI extends JFrame{
 		panel.setMaximumSize(new Dimension(194, 180));
 		JLabel title = new JLabel("Name:");
 		title.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JTextArea titleArea = new JTextArea();
+		titleArea = new JTextArea();
+		titleArea.setEditable(false);
 		JLabel created = new JLabel("Created by:");
 		created.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JTextArea createdArea = new JTextArea();
+		createdArea = new JTextArea();
 		createdArea.setEditable(false);
 		
 		JLabel permissions = new JLabel("Permissions");
