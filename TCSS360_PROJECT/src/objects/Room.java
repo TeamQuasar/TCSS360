@@ -41,9 +41,6 @@ public class Room implements Serializable{
 		/** Current Room name (folder name). */
 		private String myRoomName;
 		
-		/** Class for searching through files*/
-		private SearchEngine mySearchEngine;
-		
 		/**
 		 * Constructor to create the Room object.
 		 * 
@@ -54,7 +51,6 @@ public class Room implements Serializable{
 			myRoomName = theRoomName;
 			mySubRooms = new HashSet<Room>();
 			myFiles = new HashSet<HomeFile>();
-			mySearchEngine = new SearchEngine(mySubRooms);
 		}
 			
 		
@@ -176,7 +172,7 @@ public class Room implements Serializable{
 		 * @author Romi Tshiorny
 		 */
 		public HashSet<HomeFile> filterFiles(String query) {
-			return mySearchEngine.searchMe(query);
+			return new SearchEngine(mySubRooms).searchMe(query);
 		}
 
 		/**
