@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author Romi Tshiorny
  *
  */
-public  class AccountManager {
+public class AccountManager {
 	
 	
 	/**

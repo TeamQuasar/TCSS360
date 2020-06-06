@@ -1,6 +1,7 @@
 package objects;
 
 import java.util.HashSet;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -9,8 +10,9 @@ import java.util.ArrayList;
  * @author Evan McAllister
  * @version 1.0
  */
-public class SearchEngine 
+public class SearchEngine implements Serializable
 {
+	private static final long serialVersionUID = 5410866876698048600L;
 	HashSet<Room> mySet;
 	int dataSize;
 	
@@ -64,9 +66,9 @@ public class SearchEngine
 	 * @param query String object used to search this SearchEngine's set for matches. 
 	 * @return ArrayList of matching HomeFile objects. 
 	 */
-	public ArrayList<HomeFile> searchMe(String query)
+	public HashSet<HomeFile> searchMe(String query)
 	{
-		ArrayList<HomeFile> matches = new ArrayList<HomeFile>();
+		HashSet<HomeFile> matches = new HashSet<HomeFile>();
 		matches.clear();
 		
 		String reg = query; //Could just leave as query, but this allows for easier editing later. 

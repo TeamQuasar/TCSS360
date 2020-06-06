@@ -1,5 +1,6 @@
 package objects;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,8 +14,12 @@ import java.util.Calendar;
  * @version 1.0
  *
  */
-public class HomeFile 
+public class HomeFile implements Serializable
 { 
+	/**
+	 * Auto generated serial ID
+	 */
+	private static final long serialVersionUID = 3891327390707397371L;
 	/** Fixture to store the file name. */
 	private String myFileName;
 	/** Fixture to store the file notes. */
@@ -118,6 +123,17 @@ public class HomeFile
 		myFileName = theNewFileName;
 	}
 	
+	/**
+	 * Method to get name of file
+	 * @return file name
+	 */
+	public String getName() {
+		return toString();
+	}
+	/**
+	 * String representation of HomeFile
+	 * @author Idris Istanbul
+	 */
 	@Override
 	public String toString() {
 		return myFileName;

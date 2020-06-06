@@ -1,43 +1,62 @@
 package objects;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Class (Room object) to create a new file. Each file
  * has an import date, name, and if necessary notes.
  * All of these fields are retrievable via getter methods.
  * 
- * @author Tshiorny Romi, 
+ * @author Romi Tshiorny
  * @author Istanbul Idris
  * @version 1.0
  *
  */
-public class Room {
+public class Room implements Serializable{
+
+	
+	/**
+	 * Location for list of currently existing users
+	 */
+	public final static File SAVE_FILE = new File(System.getProperty("user.dir") 
+			+ System.getProperty("file.separator") + "client files" + System.getProperty("file.separator") + "House.ser");
+		/**
+		* Auto Generated ID.
+	 	*/
+		private static final long serialVersionUID = -4137104956505567156L;
 
 		/** Set to hold the subRooms. */
-		Set<Room> mySubRooms;
+		private HashSet<Room> mySubRooms;
 		
 		/** Set to hold the files for current room. */
-		Set<HomeFile> myFiles;
+		private HashSet<HomeFile> myFiles;
 		
 		/** Current Room name (folder name). */
-		String myRoomName;
-		//SearchEngine mySearchEngine;
+		private String myRoomName;
+		
+		/** Class for searching through files*/
+		private SearchEngine mySearchEngine;
 		
 		/**
 		 * Constructor to create the Room object.
 		 * 
-		 * @author Tshiorny Romi
-		 * 
+		 * @author Tshiorny Romi 
 		 * @param theRoomName - Name for the room (folder name).
 		 */
 		public Room(String theRoomName) {
 			myRoomName = theRoomName;
 			mySubRooms = new HashSet<Room>();
 			myFiles = new HashSet<HomeFile>();
-			//TODO make search engine
+			mySearchEngine = new SearchEngine(mySubRooms);
 		}
+			
 		
 		/**
 		 * Method that will add a room to the current room.
@@ -45,9 +64,62 @@ public class Room {
 		 * @author Idris Istanbul
 		 * 
 		 * @param theRoomName - The name of the room to be added.
+		 * @return true if adding room was successful, false otherwise.
 		 */
-		public void addRoom(String theRoomName) {
-			mySubRooms.add(new Room(theRoomName));
+		public boolean addRoom(String theRoomName) {
+			
+			return mySubRooms.add(new Room(theRoomName));
+		}
+		
+		/**
+		 * Method for deleting a room
+		 * @author Romi Tshiorny
+		 * @param theRoomName room to be deleted
+		 */
+		public void removeRoom(String theRoomName) {
+			mySubRooms.remove(new Room(theRoomName));
+		}
+		
+		/**
+		 * Static method for saving a room
+		 * @author Romi Tshiorny
+		 */
+		public static void saveRoom(Room theRoom) {
+			try {
+				FileOutputStream outFile = new FileOutputStream(SAVE_FILE);
+				ObjectOutputStream writer = new ObjectOutputStream(outFile);
+				writer.writeObject(theRoom);
+				writer.close();
+				outFile.close();
+			}
+			catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+		/**
+		 * Static method for loading the Room
+		 * @author Romi Tshiorny
+		 * @param roomName name for room loading in
+		 * @return a Room object of the loaded in room
+		 */
+		public static Room loadRoom(String roomName) {
+			try {
+				FileInputStream inFile = new FileInputStream(SAVE_FILE);
+				ObjectInputStream reader = new ObjectInputStream(inFile);
+				Room myRoom = (Room) reader.readObject();
+				reader.close();
+				inFile.close();
+				return myRoom;
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+			catch(ClassNotFoundException c) {
+				c.printStackTrace();
+				return null;
+			}
 		}
 		
 		/**
@@ -71,27 +143,27 @@ public class Room {
 		/**
 		 * Accessor method for the subRooms set.
 		 * 
-		 * @author Tshiorny Romi
+		 * @author Romi Tshiorny
 		 * @return - SubRoom set.
 		 */
-		public Set<Room> getSubRooms() {
+		public HashSet<Room> getSubRooms() {
 			return mySubRooms;
 		}
 		
 		/**
 		 * Accessor method for the files for current room.
 		 * 
-		 * @author Tshiorny Romi
+		 * @author Romi Tshiorny
 		 * @return - Files for current room.
 		 */
-		public Set<HomeFile> getFiles() {
+		public HashSet<HomeFile> getFiles() {
 			return myFiles;
 		}
 		
 		/**
 		 * Accessor method for the room name.
 		 * 
-		 * @author Tshiorny Romi
+		 * @author Romi Tshiorny
 		 * 
 		 * @return - Current room name.
 		 */
@@ -100,25 +172,17 @@ public class Room {
 		}
 		
 		/**
-		 * Method to find a file.
+		 * Method to find a file with a certain string in it.
+		 * @author Romi Tshiorny
 		 */
-		public void findFile() {
-			//TODO
-			//SearchEngine
+		public HashSet<HomeFile> filterFiles(String query) {
+			return mySearchEngine.searchMe(query);
 		}
-		
-		/**
-		 * Method to export files.
-		 * 
-		 */
-		public void exportFile() {
-			//TODO
-		}
-		
+
 		/**
 		 * Method to add files to current room.
 		 * 
-		 * @author Tshiorny Romi
+		 * @author Romi Tshiorny
 		 * 
 		 * @param theFile - The file to be added.
 		 */
@@ -129,6 +193,17 @@ public class Room {
 		@Override
 		public String toString() {
 			return myRoomName;
+		}
+		
+		/**
+		 * equals method for room
+		 * @author Romi Tshiorny
+		 * @param other Room
+		 * @return True if they have the same name (Since its a set no need to check for other equality)
+		 */
+		public boolean equals(Room other) {
+			
+			return myRoomName.equals(other.getRoomName());
 		}
 		
 }
