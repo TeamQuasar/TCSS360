@@ -139,4 +139,12 @@ public class HomeFile implements Serializable
 		return myFileName;
 	}
 	
+	@Override
+	public boolean equals(Object theObject) {
+		HomeFile h = (HomeFile) theObject;
+		return h.getFileName() == this.getFileName() &&
+				h.getFileNotes() == this.getFileNotes() &&
+				h.getImportDate() == this.getImportDate();
+	}
+	
 }
