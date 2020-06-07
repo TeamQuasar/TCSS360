@@ -1,8 +1,11 @@
 package objects;
 
+import java.io.File;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 /**
@@ -14,8 +17,14 @@ import java.util.Calendar;
  * @version 1.0
  *
  */
-public class HomeFile implements Serializable
+public class HomeFile extends File implements Serializable
 { 
+	
+	/**
+	 * Location for list of currently existing users
+	 */
+	public final static File SAVE_FILE = new File(System.getProperty("user.dir") 
+			+ System.getProperty("file.separator") + "client files" + System.getProperty("file.separator") );
 	/**
 	 * Auto generated serial ID
 	 */
@@ -28,36 +37,34 @@ public class HomeFile implements Serializable
 	private final String myImportDate;
 	
 	/**
-	 * Constructor for creating a new file.
-	 * @author Idris Istanbul
-	 *  
-	 * @param theFileName - The name of the new file.
-	 * @param theUserNotes - Notes for the new file.
-	 */
-	public HomeFile(final String theFileName, final String theUserNotes)
-	{
-		myFileName = theFileName;
-		myFileNotes = theUserNotes;
-		
-		//Date Format
-		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-		
-		//If needed to see the time, use the line below instead.
-		//DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-		
-		myImportDate = df.format(Calendar.getInstance().getTime());
-	}
-	
-	/**
-	 * Constructor for creating a File without notes by default
+	 * Constructor for creating a File from a file path
 	 * @author Romi Tshiorny
 	 * 
 	 * @param theFileName The name of the new file.
 	 */
-	public HomeFile(final String theFileName) {
-		this(theFileName, "");
+	public HomeFile(String path) {
+		super(path);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		LocalDateTime now = LocalDateTime.now();
+		myImportDate = formatter.format(now);
+		myFileName = super.getName();
+		myFileNotes = "";
 	}
 	
+	/**
+	 * Constructor for making a blank file w/ nothing in it
+	 */
+	public HomeFile(String theName, String theNotes) {
+		super(SAVE_FILE.getPath());
+		myFileName = theName;
+		myFileNotes = theNotes;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		LocalDateTime now = LocalDateTime.now();
+		myImportDate = formatter.format(now);
+	}
+	
+	
+
 	/**
 	 * Method to append notes to the current file notes fixture.
 	 * @author Idris Istanbul
@@ -87,7 +94,7 @@ public class HomeFile implements Serializable
 	 */
 	public String getFileName()
 	{
-		return myFileName;
+		return getName();
 	}
 	
 	/**

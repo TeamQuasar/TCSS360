@@ -100,6 +100,8 @@ public class AccountManager {
 	 * @return true if creation was successful, false otherwise
 	 */
 	public boolean createAccount(String theUsername, String thePassword) {
+		
+		
 		for(User u: myUserList) {
 			if(theUsername.equals(u.getUsername())) {
 				return false; // USERNAME ALREADY EXISTS

@@ -20,6 +20,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -73,7 +74,7 @@ public class GUI extends JFrame{
 	
 	private DefaultListModel<HomeFile> listModel;
 	
-	private JList fileList;
+	private JList<HomeFile> fileList;
 	
 	private JTextArea titleArea;
 	
@@ -85,11 +86,24 @@ public class GUI extends JFrame{
 	
 	private boolean isDeleting;
 	
+	
+	private JComboBox<Room> roomBox;
+	
+	
+	/**
+	 * Room for the entire house (not visible)
+	 */
+	private Room House;
+	
 	/**
 	 * Parameterless constructor
 	 */
 	public GUI() {
 		super("Homeowner's Manual PRO");
+		House = new Room("House");
+		/*** ENABLE THIS LINE TO WIPE ALL ROOMS UPON STARTUP ***/
+		Room.saveRoom(House);
+		House = Room.loadRoom("House");
 	}
 	
 	/**
@@ -142,6 +156,25 @@ public class GUI extends JFrame{
 		fileMenu.add(importItem);
 		fileMenu.add(exportItem);
 		
+		importItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final JFileChooser chooser = new JFileChooser();
+				int result = chooser.showOpenDialog(new JFrame());
+				if(result == JFileChooser.APPROVE_OPTION) {
+					HomeFile newFile = new HomeFile(chooser.getSelectedFile().getName());
+					listModel.addElement(newFile);
+					myRoom.addFile(newFile);
+					myFiles = myRoom.getFiles();
+					updateDisplay();
+					myRoom.addFile(newFile);
+				}
+			}
+			
+        });
+		
+		
+		
 		JMenuItem aboutItem = new JMenuItem("About");
 		JMenuItem userItem = new JMenuItem("Users");
 		optionsMenu.add(aboutItem);
@@ -157,6 +190,18 @@ public class GUI extends JFrame{
 			
         });
 		
+		userItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					new UsersWindow().start(myManager);
+				} catch(IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			
+        });
+		
 		return menuBar;
 	}
 	
@@ -165,6 +210,20 @@ public class GUI extends JFrame{
 		JPanel top = new JPanel();
 		JPanel middle = new JPanel();
 		JPanel bottom = new JPanel();
+		
+		/**** This is how I'm getting the + button to the right of the roomBox - Romi  ****/
+		JPanel selectorPanel = new JPanel();
+		JPanel addPanel = new JPanel();
+		
+		selectorPanel.setMinimumSize(new Dimension(154,23));
+		addPanel.setMinimumSize(new Dimension(40,25));
+		
+		selectorPanel.setMaximumSize(new Dimension(154,23));
+		addPanel.setMaximumSize(new Dimension(40,25));
+		
+		selectorPanel.setLayout(new BorderLayout());
+		addPanel.setLayout(new BorderLayout());
+		/********/
 		
 		panel.setBorder(new EmptyBorder(0, 10, 0, 10));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -176,12 +235,45 @@ public class GUI extends JFrame{
 		
 		top.setMaximumSize(new Dimension(194, 50));
 		
-		JComboBox<Room> roomBox = new JComboBox<>();
-		top.add(roomBox);
+		roomBox = new JComboBox<Room>();
+		JPanel roomPanel = new JPanel();
+		JButton addRoomButton = new JButton("+");
+		
+		panel.setBorder(new EmptyBorder(0, 10, 0, 10));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setPreferredSize(new Dimension(194, 600));
+
+		top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+		middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
+		bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+		
+		top.setMaximumSize(new Dimension(194, 50));	
+		
+		roomPanel.setLayout(new BoxLayout(roomPanel,BoxLayout.X_AXIS));
+		roomPanel.setPreferredSize(new Dimension(194,25));
+		roomPanel.setMinimumSize(new Dimension(194,25));
+		roomPanel.setMaximumSize(new Dimension(194,25));
+		roomPanel.add(selectorPanel);
+		roomPanel.add(addPanel);
+		
+		selectorPanel.add(roomBox);
+		addPanel.add(addRoomButton);
+		
+		addRoomButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				fileList.setSelectedIndex(0);
+				RoomName getNameGUI = new RoomName();
+				getNameGUI.start(roomBox, House);
+			}
+		
+		});
+		top.add(roomPanel);
+		
 		
 		JTextArea searchBar = new JTextArea("Search");
-		//searchBar.setBorder(new EmptyBorder(0, 0, 10, 0));
-		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
@@ -191,41 +283,45 @@ public class GUI extends JFrame{
 		
 		//bottom = generateInfoPanel();
 		
-		// For testing purposes
+		/**** For testing purposes ****/
 		
-		Room bedroom = new Room("Bedroom");
-		Room kitchen = new Room("Kitchen");
+//		Room bedroom = new Room("Bedroom");
+//		Room kitchen = new Room("Kitchen");
+//		
+//		bedroom.addFile(new HomeFile("Bed"));
+//		bedroom.addFile(new HomeFile("Dresser"));
+//		bedroom.addFile(new HomeFile("Lamp"));
+//		bedroom.addFile(new HomeFile("Desk"));
+//		bedroom.addFile(new HomeFile("Closet"));
+//		bedroom.addFile(new HomeFile("Sheets"));
+//		bedroom.addFile(new HomeFile("Computer"));
+//		bedroom.addFile(new HomeFile("Keyboard"));
+//		bedroom.addFile(new HomeFile("TV"));
+//		
+//		kitchen.addFile(new HomeFile("Stove"));
+//		kitchen.addFile(new HomeFile("Fridge"));
+//		kitchen.addFile(new HomeFile("Microwave"));
+//		kitchen.addFile(new HomeFile("Banana"));
+//		kitchen.addFile(new HomeFile("Blender"));
+//		kitchen.addFile(new HomeFile("Oven"));
+//		kitchen.addFile(new HomeFile("Fryer"));
+//		kitchen.addFile(new HomeFile("Apple"));
 		
-		bedroom.addFile(new HomeFile("Bed"));
-		bedroom.addFile(new HomeFile("Dresser"));
-		bedroom.addFile(new HomeFile("Lamp"));
-		bedroom.addFile(new HomeFile("Desk"));
-		bedroom.addFile(new HomeFile("Closet"));
-		bedroom.addFile(new HomeFile("Sheets"));
-		bedroom.addFile(new HomeFile("Computer"));
-		bedroom.addFile(new HomeFile("Keyboard"));
-		bedroom.addFile(new HomeFile("TV"));
 		
-		kitchen.addFile(new HomeFile("Stove"));
-		kitchen.addFile(new HomeFile("Fridge"));
-		kitchen.addFile(new HomeFile("Microwave"));
-		kitchen.addFile(new HomeFile("Banana"));
-		kitchen.addFile(new HomeFile("Blender"));
-		kitchen.addFile(new HomeFile("Oven"));
-		kitchen.addFile(new HomeFile("Fryer"));
-		kitchen.addFile(new HomeFile("Apple"));
+		for(Room r : House.getSubRooms())
+		{
+			roomBox.addItem(r);
+		}	
 		
-		roomBox.addItem(bedroom);
-		roomBox.addItem(kitchen);
-		
-		roomBox.setSelectedIndex(0);
-        for (HomeFile h : bedroom.getFiles()) {
-        	listModel.addElement(h);
-        }
-        
+		if(House.getSubRooms().size()>0) {		
+			roomBox.setSelectedIndex(0);
+		}
+		       
         myRoom = (Room) roomBox.getSelectedItem();
-        myFiles = myRoom.getFiles();
-        fileList.setSelectedIndex(0);
+        myFiles = House.getFiles();
+        if(myFiles.size()>0) {
+        	 fileList.setSelectedIndex(0);
+        }
         myFile = (HomeFile) fileList.getSelectedValue();
 		
 		// End
@@ -366,6 +462,7 @@ public class GUI extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(filesArea, 
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(12);
 		panel.add(scrollPane, BorderLayout.CENTER);
 		panel.setPreferredSize(new Dimension(600, 600));
 		return panel;
@@ -409,6 +506,7 @@ public class GUI extends JFrame{
 		
 		return panel;
 	}
+	
 	
 	private void updateDisplay() {
 		filesArea.removeAll();
