@@ -37,7 +37,7 @@ public class Login extends JFrame {
 	/**
 	 * Account manager for the program
 	 */
-	AccountManager myManager;
+	private AccountManager myManager;
 	
 	/**
 	 * Main JFrame
