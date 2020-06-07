@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -27,8 +28,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
@@ -64,11 +67,23 @@ public class GUI extends JFrame{
 	
 	private HomeFile myFile;
 	
+	private Set<HomeFile> myFiles;
+	
+	private Room myRoom;
+	
 	private DefaultListModel<HomeFile> listModel;
+	
+	private JList fileList;
 	
 	private JTextArea titleArea;
 	
 	private JTextArea createdArea;
+	
+	private JTextArea notesArea;
+	
+	private JPanel filesArea;
+	
+	private boolean isDeleting;
 	
 	/**
 	 * Parameterless constructor
@@ -170,11 +185,11 @@ public class GUI extends JFrame{
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
-		JList fileList = new JList<HomeFile>(listModel);
+		fileList = new JList<HomeFile>(listModel);
 		fileList.setMaximumSize(new Dimension(194, 500));
 		middle.add(fileList);
 		
-		bottom = generateInfoPanel();
+		//bottom = generateInfoPanel();
 		
 		// For testing purposes
 		
@@ -184,11 +199,21 @@ public class GUI extends JFrame{
 		bedroom.addFile(new HomeFile("Bed"));
 		bedroom.addFile(new HomeFile("Dresser"));
 		bedroom.addFile(new HomeFile("Lamp"));
+		bedroom.addFile(new HomeFile("Desk"));
+		bedroom.addFile(new HomeFile("Closet"));
+		bedroom.addFile(new HomeFile("Sheets"));
+		bedroom.addFile(new HomeFile("Computer"));
+		bedroom.addFile(new HomeFile("Keyboard"));
+		bedroom.addFile(new HomeFile("TV"));
 		
 		kitchen.addFile(new HomeFile("Stove"));
 		kitchen.addFile(new HomeFile("Fridge"));
 		kitchen.addFile(new HomeFile("Microwave"));
 		kitchen.addFile(new HomeFile("Banana"));
+		kitchen.addFile(new HomeFile("Blender"));
+		kitchen.addFile(new HomeFile("Oven"));
+		kitchen.addFile(new HomeFile("Fryer"));
+		kitchen.addFile(new HomeFile("Apple"));
 		
 		roomBox.addItem(bedroom);
 		roomBox.addItem(kitchen);
@@ -197,6 +222,11 @@ public class GUI extends JFrame{
         for (HomeFile h : bedroom.getFiles()) {
         	listModel.addElement(h);
         }
+        
+        myRoom = (Room) roomBox.getSelectedItem();
+        myFiles = myRoom.getFiles();
+        fileList.setSelectedIndex(0);
+        myFile = (HomeFile) fileList.getSelectedValue();
 		
 		// End
 		
@@ -204,25 +234,62 @@ public class GUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JComboBox<?> box = (JComboBox<?>) e.getSource();
-		        Room room = (Room) box.getSelectedItem();
+		        myRoom = (Room) box.getSelectedItem();
+		        myFiles = myRoom.getFiles();
+		        updateDisplay();
 		        listModel.removeAllElements();
-		        for (HomeFile h : room.getFiles()) {
+		        for (HomeFile h : myRoom.getFiles()) {
 		        	listModel.addElement(h);
 		        }
+		        fileList.setSelectedIndex(0);
 			}
         });
 		
 		fileList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting() && !roomBox.isFocusOwner()) {
+				if (!e.getValueIsAdjusting() && !roomBox.isFocusOwner() && !isDeleting) {
 						myFile = (HomeFile) fileList.getSelectedValue();
 						titleArea.setText(myFile.toString());
 						createdArea.setText(myFile.getImportDate());
+						notesArea.setText(myFile.getFileNotes());
 	                }
 				
 			}
         });
+		
+		JButton addFileButton = new JButton("New File");
+		addFileButton.setMaximumSize(new Dimension(194, 40));
+		addFileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		addFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}			
+		});
+		
+		JButton deleteButton = new JButton("Delete");
+		deleteButton.setMaximumSize(new Dimension(194, 20));
+		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isDeleting = true;
+				String choiceButtons[] = {"Yes","No"};
+				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
+			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+			    if (result == 0) {
+			    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
+					listModel.removeElement(fileList.getSelectedValue());
+				    updateDisplay();
+			    }
+			    isDeleting = false;
+			}			
+		});
+		
+		bottom.add(addFileButton);
+		bottom.add(Box.createRigidArea(new Dimension(0, 10)));
+		bottom.add(deleteButton);
 		
 		panel.add(top);
 		panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -245,76 +312,127 @@ public class GUI extends JFrame{
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(294, 600));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		JTextArea notesArea = new JTextArea("NOTES");
-		notesArea.setPreferredSize(new Dimension(225, 400));
+		notesArea = new JTextArea();
+		//notesArea.setPreferredSize(new Dimension(225, 400));
 		JButton saveButton = new JButton("Save");
 		saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		saveButton.setMaximumSize(new Dimension(294, 20));
+		
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				myFile.addNote(notesArea.getText());
+			}
+        });
+		
+		JButton openButton = new JButton("Open");
+		openButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		openButton.setPreferredSize(new Dimension(294, 100));
+		openButton.setMinimumSize(new Dimension(294, 100));
+		openButton.setMaximumSize(new Dimension(294, 100));
+		
+		openButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Opening File...");
+			}
+        });
+		
+		JPanel notePanel = new JPanel();
+		notePanel.setLayout(new BoxLayout(notePanel, BoxLayout.Y_AXIS));
+		notePanel.setBorder(BorderFactory.createCompoundBorder(new TitledBorder("Notes"), new EmptyBorder(2, 2, 2, 2)));
+		notePanel.add(notesArea);
+		notePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		notePanel.add(saveButton);
+		
 		panel.setBorder(new EmptyBorder(0, 10, 0, 10));
-		panel.add(notesArea);
+		panel.add(openButton);
 		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		panel.add(saveButton);
+		panel.add(generateInfoPanel());
+		panel.add(Box.createRigidArea(new Dimension(0, 10)));
+		panel.add(notePanel);
 		return panel;
 	}
 	
 	private JPanel generateDisplayPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		JLabel display = new JLabel();
-		display.setPreferredSize(new Dimension(600, 600));
-		display.setOpaque(true);
-		display.setBackground(Color.WHITE);
-		//display.setBorder(BorderFactory.createLineBorder(Color.black));
-		panel.add(display, BorderLayout.CENTER);
+		FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0);
+		filesArea = new JPanel();
+		filesArea.setOpaque(true);
+		filesArea.setBackground(Color.WHITE);
+		filesArea.setLayout(layout);
+		updateDisplay();
+		JScrollPane scrollPane = new JScrollPane(filesArea, 
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		panel.add(scrollPane, BorderLayout.CENTER);
+		panel.setPreferredSize(new Dimension(600, 600));
 		return panel;
 	}
 	
 	private JPanel generateInfoPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setMaximumSize(new Dimension(194, 180));
+		panel.setMaximumSize(new Dimension(294, 180));
 		JLabel title = new JLabel("Name:");
 		title.setAlignmentX(Component.CENTER_ALIGNMENT);
 		titleArea = new JTextArea();
 		titleArea.setEditable(false);
-		JLabel created = new JLabel("Created by:");
+		JLabel created = new JLabel("Created on:");
 		created.setAlignmentX(Component.CENTER_ALIGNMENT);
 		createdArea = new JTextArea();
 		createdArea.setEditable(false);
 		
-		JLabel permissions = new JLabel("Permissions");
+		JLabel permissions = new JLabel("Editing Permissions:");
 		permissions.setAlignmentX(Component.CENTER_ALIGNMENT);
-		String[] perms = {"Only Me", "Everyone can view", "Everyone can edit"};
+		String[] perms = {"Only Me", "Everyone"};
 		JComboBox<String> permissionsBox = new JComboBox<>(perms);
 		
-		JButton deleteButton = new JButton("Delete");
-		deleteButton.setMaximumSize(new Dimension(194, 20));
-		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		deleteButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				 String choiceButtons[] = {"Yes","No"};
-			        int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
-			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
-			        //TODO
-			}			
-		});
+		JPanel p1 = new JPanel();
+		JPanel p2 = new JPanel();
+		JPanel p3 = new JPanel();
+		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+		p2.setLayout(new BoxLayout(p2, BoxLayout.Y_AXIS));
+		p3.setLayout(new BoxLayout(p3, BoxLayout.Y_AXIS));
+		p1.setBorder(BorderFactory.createCompoundBorder(new TitledBorder("Name"), new EmptyBorder(2, 2, 2, 2)));
+		p2.setBorder(BorderFactory.createCompoundBorder(new TitledBorder("Created On"), new EmptyBorder(2, 2, 2, 2)));
+		p3.setBorder(BorderFactory.createCompoundBorder(new TitledBorder("Editing Permissions"), new EmptyBorder(2, 2, 2, 2)));
 		
-		panel.add(title);
-		panel.add(Box.createRigidArea(new Dimension(0, 5)));
-		panel.add(titleArea);
-		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		panel.add(created);
-		panel.add(Box.createRigidArea(new Dimension(0, 5)));
-		panel.add(createdArea);
-		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		panel.add(permissions);
-		panel.add(Box.createRigidArea(new Dimension(0, 5)));
-		panel.add(permissionsBox);
-		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		panel.add(deleteButton);
+		p1.add(titleArea);
+		p2.add(createdArea);
+		p3.add(permissionsBox);
+		
+		panel.add(p1);
+		panel.add(p2);
+		panel.add(p3);
 		
 		return panel;
+	}
+	
+	private void updateDisplay() {
+		filesArea.removeAll();
+		filesArea.revalidate();
+		filesArea.repaint();
+		for(HomeFile h : myFiles) {
+			filesArea.add(generateFileButton(h));
+		}
+		filesArea.setPreferredSize(new Dimension(600, 290*(myFiles.size()+2)/2));
+	}
+	
+	private JButton generateFileButton(HomeFile theFile) {
+		JButton button = new JButton(theFile.toString());
+		button.setPreferredSize(new Dimension(290, 290));
+		button.setBackground(Color.white);
+		button.setOpaque(true);
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				 myFile = theFile;
+				 fileList.setSelectedValue(theFile, true);
+			}			
+		});
+		return button;
 	}
 	
 }

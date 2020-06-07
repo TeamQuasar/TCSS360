@@ -126,6 +126,21 @@ public class Room {
 			myFiles.add(theFile);
 		}
 		
+		/**
+		 * Removes a file from the room.
+		 * 
+		 * @author Collin Nguyen
+		 * @param theFile - The file to be removed.
+		 */
+		public void removeFile(HomeFile theFile) {
+			myFiles.remove((HomeFile) theFile);
+		}
+		
+		/**
+		 * Return string
+		 * 
+		 * @author Collin Nguyen
+		 */
 		@Override
 		public String toString() {
 			return myRoomName;
