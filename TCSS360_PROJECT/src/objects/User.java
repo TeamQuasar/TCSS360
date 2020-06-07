@@ -69,6 +69,14 @@ public class User implements Serializable{
 	}
 	
 	/**
+	 * Toggles the admin status of a user (can only be done by another admin)
+	 * @author Romi Tshiorny
+	 */
+	public void toggleAdmin() {
+		adminStatus = !adminStatus;
+	}
+	
+	/**
 	 * Method for checking if an entered username and password match the users'
 	 * @author Romi Tshiorny
 	 * @param enteredUsername username for login
@@ -105,6 +113,23 @@ public class User implements Serializable{
 	 */
 	public String getUsername() {
 		return myUsername;
+	}
+	
+	/**
+	 * String representation of User
+	 * @return User Name
+	 */
+	@Override
+	public String toString() {
+		String status = adminStatus?"Admin":"User";
+		status = getUsername() + " (" + status + ")";		
+		return String.format("%s", status); //FORMATING NOT ACTUALLY USED HERE
+	}
+	
+	public boolean equals(User other) {
+		return adminStatus == other.getAdminStat()
+				&& other.verifyCredentials(myUsername, myPassword);
+		
 	}
 	
 }
