@@ -466,7 +466,7 @@ public class GUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(myFile != null) {
-					myFile.addNote(notesArea.getText());
+					myFile.updateNote(notesArea.getText());
 				} else {
 					JOptionPane.showMessageDialog(myFrame,
 						    "No file selected",
