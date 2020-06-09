@@ -17,7 +17,7 @@ import javax.swing.JPanel;
  * @author Romi Tshiorny
  * @author Collin Nguyen
  * @author Idris Istanbul
- * @version 1.0
+ * @version 1.8
  */
 public class About extends JOptionPane
 {

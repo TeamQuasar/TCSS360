@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author Romi Tshiorny
  *
  */
-public  class AccountManager {
+public class AccountManager {
 	
 	
 	/**
@@ -25,7 +25,7 @@ public  class AccountManager {
 	/**
 	 * List containing all available Users/accounts for the program
 	 */
-	public ArrayList<User> myUserList;
+	private ArrayList<User> myUserList;
 	
 	/**
 	 * The current user accessing the application
@@ -43,11 +43,11 @@ public  class AccountManager {
 	}
 	
 	/**
-	 * Private method for storing the contents of userList into a a file via
+	 * Method for storing the contents of userList into a a file via
 	 * serialization turning it into a byte stream.
 	 * @author Romi Tshiorny
 	 */
-	private void serialize() {
+	public void serialize() {
 		try {
 			FileOutputStream outFile = new FileOutputStream(SAVE_FILE);
 			ObjectOutputStream writer = new ObjectOutputStream(outFile);
@@ -100,6 +100,8 @@ public  class AccountManager {
 	 * @return true if creation was successful, false otherwise
 	 */
 	public boolean createAccount(String theUsername, String thePassword) {
+		
+		
 		for(User u: myUserList) {
 			if(theUsername.equals(u.getUsername())) {
 				return false; // USERNAME ALREADY EXISTS
@@ -154,12 +156,26 @@ public  class AccountManager {
 	
 	/**
 	 * Completely clears all the users from the both the program and internal data
+	 * @author Romi Tshiorny
 	 */
 	public void clearUsers() {
 		logout();
 		myUserList = new ArrayList<User>();
 		serialize();
 		
+	}
+	
+	public void deleteUser(User theUser) {
+		myUserList.remove(theUser);
+		serialize();
+	}
+	
+	/**
+	 * Getter for list of users
+	 * @return Arraylist of users
+	 */
+	public ArrayList<User> getListOfUsers(){
+		return myUserList;
 	}
 	
 //  //Just some code for testing the serialization process

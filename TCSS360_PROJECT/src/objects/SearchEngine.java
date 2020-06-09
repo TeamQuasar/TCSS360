@@ -1,6 +1,7 @@
 package objects;
 
 import java.util.HashSet;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -9,8 +10,9 @@ import java.util.ArrayList;
  * @author Evan McAllister
  * @version 1.0
  */
-public class SearchEngine 
+public class SearchEngine implements Serializable
 {
+	private static final long serialVersionUID = 5410866876698048600L;
 	HashSet<Room> mySet;
 	int dataSize;
 	
@@ -22,7 +24,6 @@ public class SearchEngine
 	public SearchEngine(HashSet<Room> theSet)
 	{
 		mySet = theSet;
-		updateSize(theSet);
 	}
 	
 	/*
@@ -33,7 +34,6 @@ public class SearchEngine
 	public void changeSet(HashSet<Room> newSet)
 	{
 		mySet = newSet;
-		updateSize(newSet);
 	}
 	
 	/*
@@ -57,6 +57,16 @@ public class SearchEngine
 	}
 	
 	/*
+	 *  Method to get the size of the data set this SearchEngine currently operates on.  
+	 * 
+	 *  @return Number of rooms searched by this SearchEngine.    
+	 */
+	public int getDataSize()
+	{
+		return mySet.size();
+	}
+	
+	/*
 	 * Method to get list of HomeFile objects related to String search. 
 	 * 
 	 * Searches currently ignore case and look for containment. 
@@ -64,9 +74,9 @@ public class SearchEngine
 	 * @param query String object used to search this SearchEngine's set for matches. 
 	 * @return ArrayList of matching HomeFile objects. 
 	 */
-	public ArrayList<HomeFile> searchMe(String query)
+	public HashSet<HomeFile> searchMe(String query)
 	{
-		ArrayList<HomeFile> matches = new ArrayList<HomeFile>();
+		HashSet<HomeFile> matches = new HashSet<HomeFile>();
 		matches.clear();
 		
 		String reg = query; //Could just leave as query, but this allows for easier editing later. 
@@ -101,14 +111,4 @@ public class SearchEngine
 	}
 	
 	//TODO: Allow search of notes for keyword too.
-	
-	/*
-	 *  Method to update size of database.  
-	 * 
-	 *  @param theSet A set of room objects to size check.  
-	 */
-	private void updateSize(HashSet<Room> theSet)
-	{
-		dataSize = theSet.size();
-	}
 }

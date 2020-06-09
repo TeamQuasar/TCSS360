@@ -1,6 +1,7 @@
 package tests;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
@@ -31,25 +32,18 @@ class UserSettingsTest
 
 	//Test that the UserSettings constructor for Files works. 
 	@Test
-	void testFileConstructor() 
+	void testFileConstructor() throws IOException
 	{
 		f = new File("tempfile.txt");
 		
 		String firstName = "Fred";
 		String email = "fred@email.com";
 		
-		try 
-		{
-			PrintWriter writer = new PrintWriter(f);
-			writer.println(firstName);
-			writer.println(email);
-			writer.close();
-		} 
-		catch(IOException e) 
-		{
-			System.out.println("Error creating file");
-			e.printStackTrace();
-		}
+
+		PrintWriter writer = new PrintWriter(f);
+		writer.println(firstName);
+		writer.println(email);
+		writer.close();
 		
 		u = new UserSettings(f);
 		
@@ -90,7 +84,7 @@ class UserSettingsTest
 	
 	//Test that the UserSettings file import method works.
 	@Test
-	void testImport() 
+	void testImport() throws IOException
 	{
 		f = new File("tempfile.txt");
 		
@@ -100,19 +94,11 @@ class UserSettingsTest
 		String name2 = "Joe";
 	    String email2 = "joe@email.com";
 		
-		try 
-		{
-			PrintWriter writer = new PrintWriter(f);
-			writer.println(name);
-			writer.println(email);
-			writer.close();
-		} 
-		catch(IOException e) 
-		{
-			System.out.println("Error creating file");
-			e.printStackTrace();
-		}
-		
+		PrintWriter writer = new PrintWriter(f);
+		writer.println(name);
+		writer.println(email);
+		writer.close();
+
 		u = new UserSettings(name2, email2);
 		
 		u.importSettings(f);
@@ -123,7 +109,7 @@ class UserSettingsTest
 	
 	//Test that the UserSettings file export method works.
 	@Test
-	void testExport() 
+	void testExport() throws FileNotFoundException, IOException
 	{
 		String name = "Fred";
 		String email = "fred@email.com";
@@ -137,20 +123,12 @@ class UserSettingsTest
 				+ System.getProperty("file.separator") + "client files" + System.getProperty("file.separator")
 				+ "tempfile.txt";
 				
-		try 
-		{
-			Scanner importer = new Scanner(new File(outputLocation));
-			String name2 = importer.nextLine();
-			String email2 = importer.nextLine();
+		Scanner importer = new Scanner(new File(outputLocation));
+		String name2 = importer.nextLine();
+		String email2 = importer.nextLine();
 			
-			assertTrue(u.getFirstName().equals(name2));
-			assertTrue(u.getEmail().equals(email2));
-			importer.close();
-		} 
-		catch(IOException e) 
-		{
-			System.out.println("Error retrieving file");
-			e.printStackTrace();
-		}	
+		assertTrue(u.getFirstName().equals(name2));
+		assertTrue(u.getEmail().equals(email2));
+		importer.close();
 	}
 }
