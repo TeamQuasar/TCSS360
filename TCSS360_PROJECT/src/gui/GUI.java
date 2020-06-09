@@ -705,9 +705,11 @@ public class GUI extends JFrame{
 				if(result == JFileChooser.APPROVE_OPTION) {	
 					HomeFile newFile = new HomeFile(chooser.getSelectedFile().getAbsolutePath());
 					listModel.addElement(newFile);
+					myRoom = House.findRoom(myRoom.getRoomName());
 					myRoom.addFile(newFile);
 					Room.saveRoom(House);
 					updateDisplay();
+					House.printRoom();
 				}
 			}
 		}
