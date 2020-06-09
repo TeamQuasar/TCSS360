@@ -149,13 +149,31 @@ public class GUI extends JFrame{
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenu optionsMenu = new JMenu("Options");
+		JMenu deleteMenu = new JMenu("Delete");
+		JMenu renameMenu = new JMenu("Rename");
 		menuBar.add(fileMenu);
 		menuBar.add(optionsMenu);
+		
+		JMenuItem deleteFileItem = new JMenuItem("File");
+		JMenuItem deleteRoomItem = new JMenuItem("Room");
+		deleteMenu.add(deleteFileItem);
+		deleteMenu.add(deleteRoomItem);
+		
+		deleteFileItem.addActionListener(new deleteFileListener());
+		deleteRoomItem.addActionListener(new deleteRoomListener());
+		
+		JMenuItem renameFileItem = new JMenuItem("File");
+		renameFileItem.addActionListener(new renameButtonListener());
+		renameMenu.add(renameFileItem);
+		
 		
 		JMenuItem importItem = new JMenuItem("Import");
 		JMenuItem exportItem = new JMenuItem("Export");
 		fileMenu.add(importItem);
 		fileMenu.add(exportItem);
+		fileMenu.addSeparator();
+		fileMenu.add(renameMenu);
+		fileMenu.add(deleteMenu);
 		
 		importItem.addActionListener(new ImportButtonListener());
 		
@@ -258,8 +276,11 @@ public class GUI extends JFrame{
 		});
 		top.add(roomPanel);
 		
-		
+		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		JTextArea searchBar = new JTextArea("Search");
+		searchBar.setMaximumSize(new Dimension(194, 50));
+		searchBar.setMinimumSize(new Dimension(194, 50));
+		searchBar.setPreferredSize(new Dimension(194, 50));
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
@@ -362,32 +383,7 @@ public class GUI extends JFrame{
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setMaximumSize(new Dimension(194, 20));
 		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		deleteButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(myFile != null) {
-					isDeleting = true;
-					String choiceButtons[] = {"Yes","No"};
-					int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
-				        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
-				    if (result == 0) {
-				    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
-						listModel.removeElement(fileList.getSelectedValue());
-					    updateDisplay();
-					    clearInfoArea();
-					    myFile = null;
-					    Room.saveRoom(House);
-				    }
-				    isDeleting = false;
-				} 
-				else {
-					JOptionPane.showMessageDialog(myFrame,
-						    "No file selected",
-						    "Error",
-						    JOptionPane.ERROR_MESSAGE);
-				}
-			}			
-		});
+		deleteButton.addActionListener(new deleteFileListener());
 		
 		bottom.add(addFileButton);
 		bottom.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -542,12 +538,12 @@ public class GUI extends JFrame{
 		for(HomeFile h : myFiles) {
 			filesArea.add(generateFileButton(h));
 		}
-		filesArea.setPreferredSize(new Dimension(600, 290*(myFiles.size()+2)/2));
+		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
 	}
 	
 	private JButton generateFileButton(HomeFile theFile) {
 		JButton button = new JButton(theFile.toString());
-		button.setPreferredSize(new Dimension(290, 290));
+		button.setPreferredSize(new Dimension(193, 193));
 		button.setBackground(Color.white);
 		button.setOpaque(true);
 		button.addActionListener(new ActionListener() {
@@ -598,6 +594,80 @@ public class GUI extends JFrame{
 			}
 		}
 		
+	}
+	
+	/**
+	 * Private action listener for deleting files
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class deleteFileListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myFile != null) {
+				isDeleting = true;
+				String choiceButtons[] = {"Yes","No"};
+				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
+			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+			    if (result == 0) {
+			    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
+					listModel.removeElement(fileList.getSelectedValue());
+				    updateDisplay();
+				    clearInfoArea();
+				    myFile = null;
+				    Room.saveRoom(House);
+			    }
+			    isDeleting = false;
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No file selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
+	}
+	
+	/**
+	 * Private action listener for deleting rooms
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class deleteRoomListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myRoom != null) {
+				// Does not work
+				// House.removeRoom(((Room)roomBox.getSelectedItem()).toString());
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No room selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
+	}
+	
+	/**
+	 * Private action listener for renaming files
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class renameButtonListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myFile != null) {
+				FileName renameFile = new FileName();
+				renameFile.start(roomBox, House, fileList);
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No file selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
 	}
 	
 }
