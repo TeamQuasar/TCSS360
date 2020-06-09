@@ -1,14 +1,11 @@
 package gui;
 
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -20,13 +17,13 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -44,8 +41,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import info.About;
 import objects.AccountManager;
@@ -75,28 +70,60 @@ public class GUI extends JFrame{
 	 */
 	private GUI myFrame;	
 	
+	/**
+	 * Selected file
+	 */
 	private HomeFile myFile;
 	
+	/**
+	 * Set of files from selected room
+	 */
 	private Set<HomeFile> myFiles;
 	
+	/**
+	 * Selected room
+	 */
 	private Room myRoom;
 	
+	/**
+	 * List of files
+	 */
 	private DefaultListModel<HomeFile> listModel;
 	
+	/**
+	 * List of files (visible list)
+	 */
 	private JList<HomeFile> fileList;
 	
+	/**
+	 * Text area that holds the name of the file
+	 */
 	private JTextArea titleArea;
 	
+	/**
+	 * Text area that holds the creation time of the file
+	 */
 	private JTextArea createdArea;
 	
+	/**
+	 * Text area that holds the notes of the file
+	 */
 	private JTextArea notesArea;
 	
+	/**
+	 * Panel that holds the big file buttons
+	 */
 	private JPanel filesArea;
 	
+	/**
+	 * Indicates if a file is being deleted to prevent issues
+	 */
 	private boolean isDeleting;
 	
+	/**
+	 * Drop down menu that holds the rooms
+	 */
 	private JComboBox<Room> roomBox;
-	
 	
 	/**
 	 * Room for the entire house (not visible)
@@ -105,6 +132,7 @@ public class GUI extends JFrame{
 	
 	/**
 	 * Parameterless constructor
+	 * @author Collin Nguyen
 	 */
 	public GUI() {
 		super("Homeowner's Manual PRO");
@@ -117,6 +145,7 @@ public class GUI extends JFrame{
 	/**
 	 * Start JFrame
 	 * @throws IOException 
+	 * @author Collin Nguyen
 	 */
 	public void start(AccountManager theManager) throws IOException {
 		myManager = theManager;
@@ -136,6 +165,7 @@ public class GUI extends JFrame{
 	 * Generates main panel.
 	 * 
 	 * @return the generated main panel
+	 * @author Collin Nguyen
 	 */
 	private JPanel generateMainPanel() {
 		JPanel mainPanel = new JPanel();
@@ -151,18 +181,37 @@ public class GUI extends JFrame{
 	 * 
 	 * @return the generated menu bar
 	 * @throws IOException 
+	 * @author Collin Nguyen
 	 */
 	private JMenuBar generateMenuBar() throws IOException {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenu optionsMenu = new JMenu("Options");
+		JMenu deleteMenu = new JMenu("Delete");
+		JMenu renameMenu = new JMenu("Rename");
 		menuBar.add(fileMenu);
 		menuBar.add(optionsMenu);
+		
+		JMenuItem deleteFileItem = new JMenuItem("File");
+		JMenuItem deleteRoomItem = new JMenuItem("Room");
+		deleteMenu.add(deleteFileItem);
+		deleteMenu.add(deleteRoomItem);
+		
+		deleteFileItem.addActionListener(new deleteFileListener());
+		deleteRoomItem.addActionListener(new deleteRoomListener());
+		
+		JMenuItem renameFileItem = new JMenuItem("File");
+		renameFileItem.addActionListener(new renameButtonListener());
+		renameMenu.add(renameFileItem);
+		
 		
 		JMenuItem importItem = new JMenuItem("Import");
 		JMenuItem exportItem = new JMenuItem("Export");
 		fileMenu.add(importItem);
 		fileMenu.add(exportItem);
+		fileMenu.addSeparator();
+		fileMenu.add(renameMenu);
+		fileMenu.add(deleteMenu);
 		
 		importItem.addActionListener(new ImportButtonListener());
 		
@@ -228,6 +277,12 @@ public class GUI extends JFrame{
 		return menuBar;
 	}
 	
+	/**
+	 * Generates the left side panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateLeftPanel() {
 		JPanel panel = new JPanel();
 		JPanel top = new JPanel();
@@ -295,8 +350,11 @@ public class GUI extends JFrame{
 		});
 		top.add(roomPanel);
 		
-		
+		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		JTextArea searchBar = new JTextArea("Search");
+		searchBar.setMaximumSize(new Dimension(194, 50));
+		searchBar.setMinimumSize(new Dimension(194, 50));
+		searchBar.setPreferredSize(new Dimension(194, 50));
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
@@ -399,32 +457,7 @@ public class GUI extends JFrame{
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setMaximumSize(new Dimension(194, 20));
 		deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		deleteButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(myFile != null) {
-					isDeleting = true;
-					String choiceButtons[] = {"Yes","No"};
-					int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
-				        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
-				    if (result == 0) {
-				    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
-						listModel.removeElement(fileList.getSelectedValue());
-					    updateDisplay();
-					    clearInfoArea();
-					    myFile = null;
-					    Room.saveRoom(House);
-				    }
-				    isDeleting = false;
-				} 
-				else {
-					JOptionPane.showMessageDialog(myFrame,
-						    "No file selected",
-						    "Error",
-						    JOptionPane.ERROR_MESSAGE);
-				}
-			}			
-		});
+		deleteButton.addActionListener(new deleteFileListener());
 		
 		bottom.add(addFileButton);
 		bottom.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -438,7 +471,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
-	
+	/**
+	 * Generates the center panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateCenterPanel() {
 		JPanel panel = new JPanel();
 		panel.setBorder(new EmptyBorder(10, 0, 10, 0));
@@ -448,6 +486,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the right side panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateRightPanel() {
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(294, 600));
@@ -462,7 +506,7 @@ public class GUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(myFile != null) {
-					myFile.addNote(notesArea.getText());
+					myFile.updateNote(notesArea.getText());
 				} else {
 					JOptionPane.showMessageDialog(myFrame,
 						    "No file selected",
@@ -514,6 +558,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the file display.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateDisplayPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -532,6 +582,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the panel that holds file information.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateInfoPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -571,7 +627,10 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
-	
+	/**
+	 * Updates the file display
+	 * @author Collin Nguyen
+	 */
 	private void updateDisplay() {
 		filesArea.removeAll();
 		filesArea.revalidate();
@@ -579,12 +638,18 @@ public class GUI extends JFrame{
 		for(HomeFile h : myFiles) {
 			filesArea.add(generateFileButton(h));
 		}
-		filesArea.setPreferredSize(new Dimension(600, 290*(myFiles.size()+2)/2));
+		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
 	}
 	
+	/**
+	 * Generates big file buttons for the display
+	 * 
+	 * @return the generated button
+	 * @author Collin Nguyen
+	 */
 	private JButton generateFileButton(HomeFile theFile) {
 		JButton button = new JButton(theFile.toString());
-		button.setPreferredSize(new Dimension(290, 290));
+		button.setPreferredSize(new Dimension(193, 193));
 		button.setBackground(Color.white);
 		button.setOpaque(true);
 		button.addActionListener(new ActionListener() {
@@ -647,6 +712,80 @@ public class GUI extends JFrame{
 			}
 		}
 		
+	}
+	
+	/**
+	 * Private action listener for deleting files
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class deleteFileListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myFile != null) {
+				isDeleting = true;
+				String choiceButtons[] = {"Yes","No"};
+				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
+			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+			    if (result == 0) {
+			    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
+					listModel.removeElement(fileList.getSelectedValue());
+				    updateDisplay();
+				    clearInfoArea();
+				    myFile = null;
+				    Room.saveRoom(House);
+			    }
+			    isDeleting = false;
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No file selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
+	}
+	
+	/**
+	 * Private action listener for deleting rooms
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class deleteRoomListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myRoom != null) {
+				// Does not work
+				// House.removeRoom(((Room)roomBox.getSelectedItem()).toString());
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No room selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
+	}
+	
+	/**
+	 * Private action listener for renaming files
+	 * @author Collin Nguyen
+	 *
+	 */
+	private class renameButtonListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myFile != null) {
+				FileName renameFile = new FileName();
+				renameFile.start(roomBox, House, fileList);
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No file selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
 	}
 	
 }

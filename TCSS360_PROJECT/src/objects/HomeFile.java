@@ -212,4 +212,12 @@ public class HomeFile extends File implements Serializable
 		DESKTOP.open(super.getAbsoluteFile());
 	}
 	
+	/**
+	 * Method for updating notes
+	 * @author Collin Nguyen
+	 */
+	public void updateNote(String theNote) {
+		myFileNotes = theNote;
+	}
+	
 }
