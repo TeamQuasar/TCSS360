@@ -3,23 +3,17 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -37,8 +31,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import info.About;
 import objects.AccountManager;
@@ -68,28 +60,60 @@ public class GUI extends JFrame{
 	 */
 	private GUI myFrame;	
 	
+	/**
+	 * Selected file
+	 */
 	private HomeFile myFile;
 	
+	/**
+	 * Set of files from selected room
+	 */
 	private Set<HomeFile> myFiles;
 	
+	/**
+	 * Selected room
+	 */
 	private Room myRoom;
 	
+	/**
+	 * List of files
+	 */
 	private DefaultListModel<HomeFile> listModel;
 	
+	/**
+	 * List of files (visible list)
+	 */
 	private JList<HomeFile> fileList;
 	
+	/**
+	 * Text area that holds the name of the file
+	 */
 	private JTextArea titleArea;
 	
+	/**
+	 * Text area that holds the creation time of the file
+	 */
 	private JTextArea createdArea;
 	
+	/**
+	 * Text area that holds the notes of the file
+	 */
 	private JTextArea notesArea;
 	
+	/**
+	 * Panel that holds the big file buttons
+	 */
 	private JPanel filesArea;
 	
+	/**
+	 * Indicates if a file is being deleted to prevent issues
+	 */
 	private boolean isDeleting;
 	
+	/**
+	 * Drop down menu that holds the rooms
+	 */
 	private JComboBox<Room> roomBox;
-	
 	
 	/**
 	 * Room for the entire house (not visible)
@@ -98,6 +122,7 @@ public class GUI extends JFrame{
 	
 	/**
 	 * Parameterless constructor
+	 * @author Collin Nguyen
 	 */
 	public GUI() {
 		super("Homeowner's Manual PRO");
@@ -110,6 +135,7 @@ public class GUI extends JFrame{
 	/**
 	 * Start JFrame
 	 * @throws IOException 
+	 * @author Collin Nguyen
 	 */
 	public void start(AccountManager theManager) throws IOException {
 		myManager = theManager;
@@ -129,6 +155,7 @@ public class GUI extends JFrame{
 	 * Generates main panel.
 	 * 
 	 * @return the generated main panel
+	 * @author Collin Nguyen
 	 */
 	private JPanel generateMainPanel() {
 		JPanel mainPanel = new JPanel();
@@ -144,6 +171,7 @@ public class GUI extends JFrame{
 	 * 
 	 * @return the generated menu bar
 	 * @throws IOException 
+	 * @author Collin Nguyen
 	 */
 	private JMenuBar generateMenuBar() throws IOException {
 		JMenuBar menuBar = new JMenuBar();
@@ -209,6 +237,12 @@ public class GUI extends JFrame{
 		return menuBar;
 	}
 	
+	/**
+	 * Generates the left side panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateLeftPanel() {
 		JPanel panel = new JPanel();
 		JPanel top = new JPanel();
@@ -397,7 +431,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
-	
+	/**
+	 * Generates the center panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateCenterPanel() {
 		JPanel panel = new JPanel();
 		panel.setBorder(new EmptyBorder(10, 0, 10, 0));
@@ -407,6 +446,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the right side panel.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateRightPanel() {
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(294, 600));
@@ -473,6 +518,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the file display.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateDisplayPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -491,6 +542,12 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	/**
+	 * Generates the panel that holds file information.
+	 * 
+	 * @return the generated panel
+	 * @author Collin Nguyen
+	 */
 	private JPanel generateInfoPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -530,7 +587,10 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
-	
+	/**
+	 * Updates the file display
+	 * @author Collin Nguyen
+	 */
 	private void updateDisplay() {
 		filesArea.removeAll();
 		filesArea.revalidate();
@@ -541,6 +601,12 @@ public class GUI extends JFrame{
 		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
 	}
 	
+	/**
+	 * Generates big file buttons for the display
+	 * 
+	 * @return the generated button
+	 * @author Collin Nguyen
+	 */
 	private JButton generateFileButton(HomeFile theFile) {
 		JButton button = new JButton(theFile.toString());
 		button.setPreferredSize(new Dimension(193, 193));

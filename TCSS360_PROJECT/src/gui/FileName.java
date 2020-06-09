@@ -70,6 +70,7 @@ public class FileName extends JFrame{
 	/**
 	 * Creates the main panel
 	 * @author Romi Tshiorny
+	 * @author Collin Nguyen
 	 * @return the Panel
 	 */
 	private JPanel createMainPanel(JComboBox<Room> roomBox, Room House, JList<HomeFile> fileList) {
