@@ -49,6 +49,8 @@ public class About extends JOptionPane
 		/* This piece of code retrieves the HTML code as a String and finds the version being displayed.
 		 * Temporary solution to a problem we really aren't sure how to solve yet.
 		 */
+		myVersion = "no connection";
+		try {
 		URL repository = new URL("https://github.com/TeamQuasar/TCSS360/blob/master/TCSS360_PROJECT/src/info/About.java");
 		Scanner html = new Scanner(repository.openStream());
 		String version = "";
@@ -63,6 +65,10 @@ public class About extends JOptionPane
 		}
 		myVersion = version;
 		html.close();
+		} catch(UnknownHostException e) {
+			//e.printStackTrace();
+			System.out.println("UNABLE TO CONNECT TO GITHUB SERVERS");
+		}
 	}
 	
 	/*
