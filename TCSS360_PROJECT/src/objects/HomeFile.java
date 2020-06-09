@@ -1,7 +1,9 @@
 package objects;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.awt.Desktop;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -35,7 +37,8 @@ public class HomeFile extends File implements Serializable
 	private String myFileNotes;
 	/** Fixture to store the file import date. */
 	private final String myImportDate;
-	
+	/** Desktop for opening files */
+	private static final Desktop DESKTOP = Desktop.getDesktop();
 	/**
 	 * Constructor for creating a File from a file path
 	 * @author Romi Tshiorny
@@ -137,6 +140,7 @@ public class HomeFile extends File implements Serializable
 	public String getName() {
 		return toString();
 	}
+
 	/**
 	 * String representation of HomeFile
 	 * @author Idris Istanbul
@@ -149,9 +153,25 @@ public class HomeFile extends File implements Serializable
 	@Override
 	public boolean equals(Object theObject) {
 		HomeFile h = (HomeFile) theObject;
+		if(theObject == null) {
+			return false;
+		}
 		return h.getFileName() == this.getFileName() &&
 				h.getFileNotes() == this.getFileNotes() &&
 				h.getImportDate() == this.getImportDate();
+	}
+	
+	/**
+	 * Method for seeing if u can open the file
+	 * @author Romi Tshiorny
+	 * @return true if the file can be opened
+	 */
+	public boolean canOpen() {
+		return super.exists();
+	}
+	
+	public void open() throws IOException {
+		DESKTOP.open(super.getAbsoluteFile());
 	}
 	
 }

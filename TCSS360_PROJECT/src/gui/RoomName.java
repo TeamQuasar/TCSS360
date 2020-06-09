@@ -123,6 +123,7 @@ public class RoomName extends JFrame{
 		roomBox.addItem(newRoom);
 		roomBox.setSelectedItem(newRoom);
 		House.addRoom(newRoom.getRoomName());
-		Room.saveRoom(House);		
+		roomBox.setEnabled(true);
+		Room.saveRoom(House);
 	}
 }
