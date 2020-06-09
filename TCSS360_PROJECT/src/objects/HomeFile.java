@@ -55,6 +55,22 @@ public class HomeFile extends File implements Serializable
 	}
 	
 	/**
+	 * Constructor for creating a File from a file and name
+	 * @author Romi Tshiorny
+	 * 
+	 * @param parentfile The name of the parent file.
+	 * @param name The name of the file
+	 */
+	public HomeFile(File parentfile, String name) {
+		super(parentfile, name);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		LocalDateTime now = LocalDateTime.now();
+		myImportDate = formatter.format(now);
+		myFileName = super.getName();
+		myFileNotes = "";
+	}
+	
+	/**
 	 * Constructor for making a blank file w/ nothing in it
 	 */
 	public HomeFile(String theName, String theNotes) {
@@ -141,6 +157,24 @@ public class HomeFile extends File implements Serializable
 		return toString();
 	}
 
+	
+	/**
+	 * Method to return the extension of a file
+	 * @return the file exension
+	 */
+	public String getExtension() {
+		String extension = "";
+		char[] filename = getName().toCharArray();
+		for(int i = filename.length-1; i >= 0; i--) {
+			System.out.println(filename[i]);
+			extension = filename[i] + extension;
+			if(filename[i] == '.') {
+				break;
+			}
+		}
+		return extension;
+	}
+	
 	/**
 	 * String representation of HomeFile
 	 * @author Idris Istanbul
@@ -170,6 +204,10 @@ public class HomeFile extends File implements Serializable
 		return super.exists();
 	}
 	
+	/**
+	 * Opens the file in the users desktop
+	 * @throws IOException
+	 */
 	public void open() throws IOException {
 		DESKTOP.open(super.getAbsoluteFile());
 	}

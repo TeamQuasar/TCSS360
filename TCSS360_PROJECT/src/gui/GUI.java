@@ -1,5 +1,7 @@
 package gui;
 
+
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -10,7 +12,12 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -158,6 +165,36 @@ public class GUI extends JFrame{
 		fileMenu.add(exportItem);
 		
 		importItem.addActionListener(new ImportButtonListener());
+		
+		exportItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(myFile == null) {
+					JOptionPane.showMessageDialog(myFrame,
+						    "Please select a room before Importing a file",
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					final JFileChooser chooser = new JFileChooser();
+					int result = chooser.showSaveDialog(new JFrame());
+					if(result == JFileChooser.APPROVE_OPTION) {	
+						String extension = myFile.getExtension();
+						HomeFile saveFile = new HomeFile(chooser.getSelectedFile().getAbsolutePath());
+						if(!saveFile.getName().endsWith(extension)) {
+							saveFile = new HomeFile(saveFile.getParentFile(), 
+									saveFile.getName() + extension);
+						}
+						try {
+							copyFile(myFile,saveFile);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+
+					}
+				}
+			}
+		});
 		
 		
 		
@@ -568,6 +605,18 @@ public class GUI extends JFrame{
 		titleArea.setText("");
 		createdArea.setText("");
 		notesArea.setText("");
+	}
+	
+	/**
+	 * Private method for copying a file from one to another
+	 * @author Romi Tshiorny
+	 * @author Pankaj from https://www.journaldev.com/861/java-copy-file
+	 * @param source file
+	 * @param dest file
+	 * @throws IOException
+	 */
+	private static void copyFile(HomeFile source, HomeFile dest) throws IOException {
+	    Files.copy(source.toPath(), dest.toPath(),StandardCopyOption.REPLACE_EXISTING);
 	}
 	
 	/**
