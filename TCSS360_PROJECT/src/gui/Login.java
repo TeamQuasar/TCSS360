@@ -60,6 +60,7 @@ public class Login extends JFrame {
 	public Login() {
 		super("HMP - Log in");
 		myManager = new AccountManager();
+		//myManager.clearUsers();
 	}
 
 	/**
@@ -69,6 +70,11 @@ public class Login extends JFrame {
 	 */
 	public void start() throws IOException {
 		if (!debug) {
+			if(myManager.getListOfUsers().size() == 0) {
+				loginButton.setEnabled(false);
+			} else {
+				loginButton.setEnabled(true);
+			}
 			myFrame = new Login();
 			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myFrame.setLayout(new BorderLayout());
@@ -126,7 +132,12 @@ public class Login extends JFrame {
 		
 		createButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				create(loginField.getText(), new String(passwordField.getPassword()));
+				try {
+					new CreateAcc().start(myManager, loginButton);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
         });
 		
@@ -177,25 +188,6 @@ public class Login extends JFrame {
 			loginButton.setEnabled(true);
 			
 		}
-	}
-	
-	/**
-	 * Attempts to create account with entered credentials
-	 * @author Collin Nguyen
-	 */
-	private void create(final String username, final String password) {
-		if (myManager.createAccount(username, password)) {
-			JOptionPane.showMessageDialog(myFrame,
-					"Account Created!",
-					"Success", 
-					JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			JOptionPane.showMessageDialog(myFrame,
-				    "Username already taken. Please try another.",
-				    "Error",
-				    JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	
+	}	
 	
 }

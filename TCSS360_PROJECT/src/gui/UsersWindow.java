@@ -52,6 +52,20 @@ public class UsersWindow extends JFrame{
 	 * Currently selected user
 	 */
 	private User selectedUser;
+	
+	/**
+	 * Constant delete account button
+	 */
+	final private JButton deleteAccountButton = new JButton("Delete");
+	
+	/**
+	 * Constant give admin button
+	 */
+	final private JButton giveAdminButton = new JButton("Toggle admin status");
+	/**
+	 * List model
+	 */
+	DefaultListModel<User> listModel;
 	/**
 	 * Parameterless constructor
 	 */
@@ -68,7 +82,6 @@ public class UsersWindow extends JFrame{
 	{
 		myManager = theManager;
 		myFrame = new UsersWindow();
-		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myFrame.setLayout(new BorderLayout());	
 		myFrame.add(createMainPanel(), BorderLayout.CENTER);
 		myFrame.pack();
@@ -87,7 +100,16 @@ public class UsersWindow extends JFrame{
 		mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		mainPanel.add(createUsersPanel(), BorderLayout.CENTER);
 		mainPanel.add(generateButtons(), BorderLayout.SOUTH);
+		mainPanel.add(createTopPanel(),BorderLayout.NORTH);
 		return mainPanel;
+	}
+	
+	private JPanel createTopPanel() {
+		JPanel top = new JPanel();
+		JLabel currentUser = new JLabel("Logged in as: " +
+				myManager.getCurrentUser().toString());
+		top.add(currentUser);
+		return top;
 	}
 	
 	/**
@@ -95,16 +117,15 @@ public class UsersWindow extends JFrame{
 	 * @author Romi Tshiorny
 	 */
 	private JList<User> createUsersPanel() {
-		DefaultListModel<User> listModel = new DefaultListModel<User>();
+		listModel = new DefaultListModel<User>();
 		JList<User> users = new JList<User>(listModel);
 		users.setLayout((new BoxLayout(users, BoxLayout.Y_AXIS)));
 		for(User u : myManager.getListOfUsers())
 		{
-//			if(!myManager.getCurrentUser().equals(u))
-//			{
-//				listModel.addElement(u);
-//			}
-			listModel.addElement(u);
+				if(!u.equals(myManager.getCurrentUser()))
+				{
+					listModel.addElement(u);
+				}
 		}
 		users.setMaximumSize(new Dimension(225,100));
 		users.setPreferredSize(new Dimension(225,100));
@@ -115,6 +136,10 @@ public class UsersWindow extends JFrame{
 				if (!e.getValueIsAdjusting()) {
 						selectedUser = (User) users.getSelectedValue();
 	                }	
+				if(myManager.getCurrentUser().getAdminStat()) {
+					deleteAccountButton.setEnabled(true);
+					giveAdminButton.setEnabled(true);
+				}
 			}
         });
 		return users;
@@ -124,47 +149,29 @@ public class UsersWindow extends JFrame{
 	private JPanel generateButtons() {
 		JPanel bottom = new JPanel();
 		bottom.setLayout(new FlowLayout());
-		JButton giveAdminButton = new JButton("Toggle admin status");
 		giveAdminButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectedUser.toggleAdmin();
+				myFrame.repaint();
 				myManager.serialize();
 				
 				
 			}});
-		JButton deleteAccountButton = new JButton("Delete");
 		deleteAccountButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				myManager.deleteUser(selectedUser);
+				listModel.removeElement(selectedUser);	
 			}});
 		
+		deleteAccountButton.setEnabled(false);
+		giveAdminButton.setEnabled(false);
 		bottom.add(deleteAccountButton);
 		bottom.add(giveAdminButton);
 		return bottom;
-	}
-	
-	public static void main(String args[]) {
-		try { 		  
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
-        } catch (Exception e) { 
-            System.out.println("Look and Feel not set"); 
-        } 
-    EventQueue.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-            try {
-				new UsersWindow().start(new AccountManager());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-    });
-	}
+	}	
 
 }

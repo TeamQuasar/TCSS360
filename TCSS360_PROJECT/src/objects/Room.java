@@ -101,12 +101,21 @@ public class Room implements Serializable{
 		 */
 		public static Room loadRoom(String roomName) {
 			try {
+				
+				if(SAVE_FILE.createNewFile()) {
+					System.out.println(SAVE_FILE.toString() +" Creation Successful");
+					Room firstRoom = new Room("Your First Room");
+					saveRoom(firstRoom);
+				}
+				 
 				FileInputStream inFile = new FileInputStream(SAVE_FILE);
-				ObjectInputStream reader = new ObjectInputStream(inFile);
+				ObjectInputStream reader = new ObjectInputStream(inFile);	
+				
 				Room myRoom = (Room) reader.readObject();
 				reader.close();
 				inFile.close();
 				return myRoom;
+				
 			}
 			catch(IOException e) {
 				e.printStackTrace();

@@ -3,11 +3,13 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -73,7 +76,7 @@ public class GUI extends JFrame{
 	
 	private DefaultListModel<HomeFile> listModel;
 	
-	private JList fileList;
+	private JList<HomeFile> fileList;
 	
 	private JTextArea titleArea;
 	
@@ -85,11 +88,23 @@ public class GUI extends JFrame{
 	
 	private boolean isDeleting;
 	
+	private JComboBox<Room> roomBox;
+	
+	
+	/**
+	 * Room for the entire house (not visible)
+	 */
+	private Room House;
+	
 	/**
 	 * Parameterless constructor
 	 */
 	public GUI() {
 		super("Homeowner's Manual PRO");
+		House = new Room("House");
+		/*** ENABLE THIS LINE TO WIPE ALL ROOMS UPON STARTUP ***/
+		//Room.saveRoom(House);
+		House = Room.loadRoom("House");
 	}
 	
 	/**
@@ -142,6 +157,10 @@ public class GUI extends JFrame{
 		fileMenu.add(importItem);
 		fileMenu.add(exportItem);
 		
+		importItem.addActionListener(new ImportButtonListener());
+		
+		
+		
 		JMenuItem aboutItem = new JMenuItem("About");
 		JMenuItem userItem = new JMenuItem("Users");
 		optionsMenu.add(aboutItem);
@@ -157,6 +176,18 @@ public class GUI extends JFrame{
 			
         });
 		
+		userItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					new UsersWindow().start(myManager);
+				} catch(IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			
+        });
+		
 		return menuBar;
 	}
 	
@@ -165,6 +196,20 @@ public class GUI extends JFrame{
 		JPanel top = new JPanel();
 		JPanel middle = new JPanel();
 		JPanel bottom = new JPanel();
+		
+		/**** This is how I'm getting the + button to the right of the roomBox - Romi  ****/
+		JPanel selectorPanel = new JPanel();
+		JPanel addPanel = new JPanel();
+		
+		selectorPanel.setMinimumSize(new Dimension(154,23));
+		addPanel.setMinimumSize(new Dimension(40,25));
+		
+		selectorPanel.setMaximumSize(new Dimension(154,23));
+		addPanel.setMaximumSize(new Dimension(40,25));
+		
+		selectorPanel.setLayout(new BorderLayout());
+		addPanel.setLayout(new BorderLayout());
+		/********/
 		
 		panel.setBorder(new EmptyBorder(0, 10, 0, 10));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -176,12 +221,45 @@ public class GUI extends JFrame{
 		
 		top.setMaximumSize(new Dimension(194, 50));
 		
-		JComboBox<Room> roomBox = new JComboBox<>();
-		top.add(roomBox);
+		roomBox = new JComboBox<Room>();
+		JPanel roomPanel = new JPanel();
+		JButton addRoomButton = new JButton("+");
+		
+		
+		panel.setBorder(new EmptyBorder(0, 10, 0, 10));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setPreferredSize(new Dimension(194, 600));
+
+		top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+		middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
+		bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+		
+		top.setMaximumSize(new Dimension(194, 50));	
+		
+		roomPanel.setLayout(new BoxLayout(roomPanel,BoxLayout.X_AXIS));
+		roomPanel.setPreferredSize(new Dimension(194,25));
+		roomPanel.setMinimumSize(new Dimension(194,25));
+		roomPanel.setMaximumSize(new Dimension(194,25));
+		roomPanel.add(selectorPanel);
+		roomPanel.add(addPanel);
+		
+		selectorPanel.add(roomBox);
+		addPanel.add(addRoomButton);
+		
+		addRoomButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				RoomName getNameGUI = new RoomName();
+				getNameGUI.start(roomBox, House);
+			}
+		
+		});
+		top.add(roomPanel);
+		
 		
 		JTextArea searchBar = new JTextArea("Search");
-		//searchBar.setBorder(new EmptyBorder(0, 0, 10, 0));
-		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
@@ -191,42 +269,55 @@ public class GUI extends JFrame{
 		
 		//bottom = generateInfoPanel();
 		
-		// For testing purposes
+		/**** For testing purposes ****/
 		
-		Room bedroom = new Room("Bedroom");
-		Room kitchen = new Room("Kitchen");
+//		Room bedroom = new Room("Bedroom");
+//		Room kitchen = new Room("Kitchen");
+//		
+//		bedroom.addFile(new HomeFile("Bed"));
+//		bedroom.addFile(new HomeFile("Dresser"));
+//		bedroom.addFile(new HomeFile("Lamp"));
+//		bedroom.addFile(new HomeFile("Desk"));
+//		bedroom.addFile(new HomeFile("Closet"));
+//		bedroom.addFile(new HomeFile("Sheets"));
+//		bedroom.addFile(new HomeFile("Computer"));
+//		bedroom.addFile(new HomeFile("Keyboard"));
+//		bedroom.addFile(new HomeFile("TV"));
+//		
+//		kitchen.addFile(new HomeFile("Stove"));
+//		kitchen.addFile(new HomeFile("Fridge"));
+//		kitchen.addFile(new HomeFile("Microwave"));
+//		kitchen.addFile(new HomeFile("Banana"));
+//		kitchen.addFile(new HomeFile("Blender"));
+//		kitchen.addFile(new HomeFile("Oven"));
+//		kitchen.addFile(new HomeFile("Fryer"));
+//		kitchen.addFile(new HomeFile("Apple"));
 		
-		bedroom.addFile(new HomeFile("Bed"));
-		bedroom.addFile(new HomeFile("Dresser"));
-		bedroom.addFile(new HomeFile("Lamp"));
-		bedroom.addFile(new HomeFile("Desk"));
-		bedroom.addFile(new HomeFile("Closet"));
-		bedroom.addFile(new HomeFile("Sheets"));
-		bedroom.addFile(new HomeFile("Computer"));
-		bedroom.addFile(new HomeFile("Keyboard"));
-		bedroom.addFile(new HomeFile("TV"));
+		if(House.getSubRooms().size() == 0) {
+			roomBox.setEnabled(false);
+		}
 		
-		kitchen.addFile(new HomeFile("Stove"));
-		kitchen.addFile(new HomeFile("Fridge"));
-		kitchen.addFile(new HomeFile("Microwave"));
-		kitchen.addFile(new HomeFile("Banana"));
-		kitchen.addFile(new HomeFile("Blender"));
-		kitchen.addFile(new HomeFile("Oven"));
-		kitchen.addFile(new HomeFile("Fryer"));
-		kitchen.addFile(new HomeFile("Apple"));
+		for(Room r : House.getSubRooms())
+		{
+			roomBox.addItem(r);
+		}	
 		
-		roomBox.addItem(bedroom);
-		roomBox.addItem(kitchen);
-		
-		roomBox.setSelectedIndex(0);
-        for (HomeFile h : bedroom.getFiles()) {
+		if(House.getSubRooms().size()>0) {		
+			roomBox.setSelectedIndex(0);
+			myRoom = (Room) roomBox.getSelectedItem();
+			
+		} else {
+			myRoom = House;
+		}
+		      
+        myFiles = myRoom.getFiles();
+        if(myFiles.size()>0) {
+        	 fileList.setSelectedIndex(0);
+        }
+        myFile = (HomeFile) fileList.getSelectedValue();
+        for (HomeFile h : myRoom.getFiles()) {
         	listModel.addElement(h);
         }
-        
-        myRoom = (Room) roomBox.getSelectedItem();
-        myFiles = myRoom.getFiles();
-        fileList.setSelectedIndex(0);
-        myFile = (HomeFile) fileList.getSelectedValue();
 		
 		// End
 		
@@ -236,12 +327,13 @@ public class GUI extends JFrame{
 				JComboBox<?> box = (JComboBox<?>) e.getSource();
 		        myRoom = (Room) box.getSelectedItem();
 		        myFiles = myRoom.getFiles();
+		        myFile = null;
 		        updateDisplay();
 		        listModel.removeAllElements();
 		        for (HomeFile h : myRoom.getFiles()) {
 		        	listModel.addElement(h);
 		        }
-		        fileList.setSelectedIndex(0);
+		        clearInfoArea();		        
 			}
         });
 		
@@ -250,9 +342,13 @@ public class GUI extends JFrame{
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting() && !roomBox.isFocusOwner() && !isDeleting) {
 						myFile = (HomeFile) fileList.getSelectedValue();
-						titleArea.setText(myFile.toString());
-						createdArea.setText(myFile.getImportDate());
-						notesArea.setText(myFile.getFileNotes());
+						if(myFile != null) {
+							titleArea.setText(myFile.toString());
+							createdArea.setText(myFile.getImportDate());
+							notesArea.setText(myFile.getFileNotes());
+						} else {
+							clearInfoArea();
+						}
 	                }
 				
 			}
@@ -261,12 +357,7 @@ public class GUI extends JFrame{
 		JButton addFileButton = new JButton("New File");
 		addFileButton.setMaximumSize(new Dimension(194, 40));
 		addFileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		addFileButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}			
-		});
+		addFileButton.addActionListener(new ImportButtonListener());
 		
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setMaximumSize(new Dimension(194, 20));
@@ -274,16 +365,27 @@ public class GUI extends JFrame{
 		deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				isDeleting = true;
-				String choiceButtons[] = {"Yes","No"};
-				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
-			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
-			    if (result == 0) {
-			    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
-					listModel.removeElement(fileList.getSelectedValue());
-				    updateDisplay();
-			    }
-			    isDeleting = false;
+				if(myFile != null) {
+					isDeleting = true;
+					String choiceButtons[] = {"Yes","No"};
+					int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this file?","Confirm Deletion",
+				        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+				    if (result == 0) {
+				    	myRoom.removeFile((HomeFile) fileList.getSelectedValue());
+						listModel.removeElement(fileList.getSelectedValue());
+					    updateDisplay();
+					    clearInfoArea();
+					    myFile = null;
+					    Room.saveRoom(House);
+				    }
+				    isDeleting = false;
+				} 
+				else {
+					JOptionPane.showMessageDialog(myFrame,
+						    "No file selected",
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
 			}			
 		});
 		
@@ -298,6 +400,7 @@ public class GUI extends JFrame{
 		panel.add(bottom);
 		return panel;
 	}
+	
 	
 	private JPanel generateCenterPanel() {
 		JPanel panel = new JPanel();
@@ -321,7 +424,14 @@ public class GUI extends JFrame{
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myFile.addNote(notesArea.getText());
+				if(myFile != null) {
+					myFile.addNote(notesArea.getText());
+				} else {
+					JOptionPane.showMessageDialog(myFrame,
+						    "No file selected",
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
 			}
         });
 		
@@ -334,7 +444,20 @@ public class GUI extends JFrame{
 		openButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Opening File...");
+				if(myFile != null) {
+					try {
+						if(myFile.canOpen()) {
+							myFile.open();
+						} else {
+							JOptionPane.showMessageDialog(myFrame,
+								    "FILE NOT FOUND",
+								    "Error",
+								    JOptionPane.ERROR_MESSAGE);
+						}
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
+				}
 			}
         });
 		
@@ -366,6 +489,7 @@ public class GUI extends JFrame{
 		JScrollPane scrollPane = new JScrollPane(filesArea, 
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(12);
 		panel.add(scrollPane, BorderLayout.CENTER);
 		panel.setPreferredSize(new Dimension(600, 600));
 		return panel;
@@ -410,6 +534,7 @@ public class GUI extends JFrame{
 		return panel;
 	}
 	
+	
 	private void updateDisplay() {
 		filesArea.removeAll();
 		filesArea.revalidate();
@@ -429,10 +554,50 @@ public class GUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				 myFile = theFile;
-				 fileList.setSelectedValue(theFile, true);
+				 fileList.setSelectedValue(myFile, true);
 			}			
 		});
 		return button;
+	}
+	
+	/**
+	 * Method for clearing the info area
+	 * @author Romi Tshiorny
+	 */
+	private void clearInfoArea() {
+		titleArea.setText("");
+		createdArea.setText("");
+		notesArea.setText("");
+	}
+	
+	/**
+	 * Private action listener for importing files
+	 * @author Romi Tshiorny
+	 *
+	 */
+	private class ImportButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(House.getSubRooms().size() == 0) {
+				JOptionPane.showMessageDialog(myFrame,
+					    "Please select a room before Importing a file",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				final JFileChooser chooser = new JFileChooser();
+				int result = chooser.showOpenDialog(new JFrame());
+				if(result == JFileChooser.APPROVE_OPTION) {	
+					HomeFile newFile = new HomeFile(chooser.getSelectedFile().getAbsolutePath());
+					listModel.addElement(newFile);
+					myRoom.addFile(newFile);
+					Room.saveRoom(House);
+					updateDisplay();
+				}
+			}
+		}
+		
 	}
 	
 }
