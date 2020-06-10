@@ -145,6 +145,18 @@ public class Room implements Serializable{
 			return null;
 		}
 		
+		public HomeFile findFile(HomeFile file) {
+			for(Room r : mySubRooms) {
+				for(HomeFile f : r.getFiles()) {
+					if(file.equals(f)) {
+						return f;
+					}
+				}
+			}
+			return null;
+			
+		}
+		
 		/**
 		 * Accessor method for the subRooms set.
 		 * 
@@ -239,6 +251,15 @@ public class Room implements Serializable{
 			for(HomeFile f: myFiles) {
 				System.out.println(myRoomName +"->" + f.getName());
 			}
+		}
+		
+		/**
+		 * Method for renaming a room
+		 * @author Romi Tshiorny
+		 * @param theName new name
+		 */
+		public void rename(String theName) {
+			myRoomName = theName;
 		}
 		
 }

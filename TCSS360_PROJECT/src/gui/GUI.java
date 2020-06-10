@@ -131,6 +131,11 @@ public class GUI extends JFrame{
 	private Room House;
 	
 	/**
+	 * Self
+	 */
+	private GUI Self = this;
+	
+	/**
 	 * Parameterless constructor
 	 * @author Collin Nguyen
 	 */
@@ -186,23 +191,26 @@ public class GUI extends JFrame{
 	private JMenuBar generateMenuBar() throws IOException {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		JMenu roomMenu = new JMenu("Room");
 		JMenu optionsMenu = new JMenu("Options");
-		JMenu deleteMenu = new JMenu("Delete");
-		JMenu renameMenu = new JMenu("Rename");
+		
 		menuBar.add(fileMenu);
+		menuBar.add(roomMenu);
 		menuBar.add(optionsMenu);
 		
-		JMenuItem deleteFileItem = new JMenuItem("File");
-		JMenuItem deleteRoomItem = new JMenuItem("Room");
-		deleteMenu.add(deleteFileItem);
-		deleteMenu.add(deleteRoomItem);
+		JMenuItem deleteFile = new JMenuItem("Delete");
+		JMenuItem renameFile = new JMenuItem("Rename");
+		JMenuItem deleteRoom = new JMenuItem("Delete");
+		JMenuItem renameRoom = new JMenuItem("Rename");
+
+		roomMenu.add(renameRoom);
+		roomMenu.add(deleteRoom);
 		
-		deleteFileItem.addActionListener(new deleteFileListener());
-		deleteRoomItem.addActionListener(new deleteRoomListener());
+		deleteFile.addActionListener(new deleteFileListener());
+		deleteRoom.addActionListener(new deleteRoomListener());
 		
-		JMenuItem renameFileItem = new JMenuItem("File");
-		renameFileItem.addActionListener(new renameButtonListener());
-		renameMenu.add(renameFileItem);
+		renameFile.addActionListener(new renameFileButtonListener());
+		renameRoom.addActionListener(new renameRoomButtonListener());
 		
 		
 		JMenuItem importItem = new JMenuItem("Import");
@@ -210,8 +218,8 @@ public class GUI extends JFrame{
 		fileMenu.add(importItem);
 		fileMenu.add(exportItem);
 		fileMenu.addSeparator();
-		fileMenu.add(renameMenu);
-		fileMenu.add(deleteMenu);
+		fileMenu.add(renameFile);
+		fileMenu.add(deleteFile);
 		
 		importItem.addActionListener(new ImportButtonListener());
 		
@@ -362,32 +370,6 @@ public class GUI extends JFrame{
 		fileList.setMaximumSize(new Dimension(194, 500));
 		middle.add(fileList);
 		
-		//bottom = generateInfoPanel();
-		
-		/**** For testing purposes ****/
-		
-//		Room bedroom = new Room("Bedroom");
-//		Room kitchen = new Room("Kitchen");
-//		
-//		bedroom.addFile(new HomeFile("Bed"));
-//		bedroom.addFile(new HomeFile("Dresser"));
-//		bedroom.addFile(new HomeFile("Lamp"));
-//		bedroom.addFile(new HomeFile("Desk"));
-//		bedroom.addFile(new HomeFile("Closet"));
-//		bedroom.addFile(new HomeFile("Sheets"));
-//		bedroom.addFile(new HomeFile("Computer"));
-//		bedroom.addFile(new HomeFile("Keyboard"));
-//		bedroom.addFile(new HomeFile("TV"));
-//		
-//		kitchen.addFile(new HomeFile("Stove"));
-//		kitchen.addFile(new HomeFile("Fridge"));
-//		kitchen.addFile(new HomeFile("Microwave"));
-//		kitchen.addFile(new HomeFile("Banana"));
-//		kitchen.addFile(new HomeFile("Blender"));
-//		kitchen.addFile(new HomeFile("Oven"));
-//		kitchen.addFile(new HomeFile("Fryer"));
-//		kitchen.addFile(new HomeFile("Apple"));
-		
 		if(House.getSubRooms().size() == 0) {
 			roomBox.setEnabled(false);
 		}
@@ -416,6 +398,7 @@ public class GUI extends JFrame{
 		
 		// End
 		
+        /**SWITCHING ROOMS ACTION**/
 		roomBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -631,15 +614,18 @@ public class GUI extends JFrame{
 	 * Updates the file display
 	 * @author Collin Nguyen
 	 */
-	private void updateDisplay() {
+	public void updateDisplay() {
 		filesArea.removeAll();
 		filesArea.revalidate();
 		filesArea.repaint();
 		for(HomeFile h : myFiles) {
 			filesArea.add(generateFileButton(h));
 		}
+		filesArea.revalidate();
+		filesArea.repaint();
 		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
 	}
+	
 	
 	/**
 	 * Generates big file buttons for the display
@@ -705,6 +691,7 @@ public class GUI extends JFrame{
 				if(result == JFileChooser.APPROVE_OPTION) {	
 					HomeFile newFile = new HomeFile(chooser.getSelectedFile().getAbsolutePath());
 					listModel.addElement(newFile);
+					myRoom.addFile(newFile);
 					myRoom = House.findRoom(myRoom.getRoomName());
 					myRoom.addFile(newFile);
 					Room.saveRoom(House);
@@ -774,16 +761,39 @@ public class GUI extends JFrame{
 	 * @author Collin Nguyen
 	 *
 	 */
-	private class renameButtonListener implements ActionListener{
+	private class renameFileButtonListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(myFile != null) {
 				FileName renameFile = new FileName();
-				renameFile.start(roomBox, House, fileList);
+				renameFile.start(roomBox, House, fileList, listModel, Self);
+				updateDisplay();
+				
 			} 
 			else {
 				JOptionPane.showMessageDialog(myFrame,
 					    "No file selected.",
+					    "Error",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}			
+	}
+	
+	/**
+	 * Private action listener for renaming Rooms
+	 * @author Romi Tshiorny
+	 *
+	 */
+	private class renameRoomButtonListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(myRoom != null) {
+				RoomRename renameUI = new RoomRename();
+				renameUI.start(roomBox, House);
+			} 
+			else {
+				JOptionPane.showMessageDialog(myFrame,
+					    "No Room Selected.",
 					    "Error",
 					    JOptionPane.ERROR_MESSAGE);
 			}

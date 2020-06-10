@@ -46,21 +46,28 @@ public class FileName extends JFrame{
 	 */
 	private String myName;
 	
+	/**
+	 * Main GUI
+	 */
+	private GUI parentGUI;
+	
 	public FileName() {
 		super("Set your File Name");
 	}
 	
 	/**
 	 * Method for starting the GUI
+	 * @param listModel 
 	 */
-	public void start(JComboBox<Room> roomBox, Room House, JList<HomeFile> fileList){
+	public void start(JComboBox<Room> roomBox, Room House, JList<HomeFile> fileList, DefaultListModel<HomeFile> listModel, GUI parent){
+		parentGUI = parent;
 		myFrame = new FileName();
 		myFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		myFrame.setLayout(new BorderLayout());
 		myFrame.setMinimumSize(new Dimension(300,150));
 		
 		
-		myFrame.add(createMainPanel(roomBox, House, fileList));
+		myFrame.add(createMainPanel(roomBox, House, fileList, listModel));
 		
 		myFrame.pack();
 		myFrame.setVisible(true);
@@ -73,7 +80,7 @@ public class FileName extends JFrame{
 	 * @author Collin Nguyen
 	 * @return the Panel
 	 */
-	private JPanel createMainPanel(JComboBox<Room> roomBox, Room House, JList<HomeFile> fileList) {
+	private JPanel createMainPanel(JComboBox<Room> roomBox, Room House, JList<HomeFile> fileList,  DefaultListModel<HomeFile> listModel) {
 		JPanel mainPanel = new JPanel();
 		JPanel fieldPanel = new JPanel();
 		JPanel buttonPanel = new JPanel();
@@ -95,7 +102,7 @@ public class FileName extends JFrame{
 		setButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				myName = roomName.getText();
-				renameFile(House, fileList);
+				renameFile(roomBox, House, fileList, listModel);
 				myFrame.dispatchEvent(new WindowEvent(myFrame, WindowEvent.WINDOW_CLOSING));
 			}
         });
@@ -123,8 +130,18 @@ public class FileName extends JFrame{
 	 * Renames file
 	 * @author Collin Nguyen
 	 */
-	private void renameFile(Room House, JList<HomeFile> fileList) {
+	private void renameFile(JComboBox<Room> roomBox,Room House, JList<HomeFile> fileList,  DefaultListModel<HomeFile> listModel) {
 		// This will need to be implemented somehow
-		// fileList.getSelectedValue().rename(myName);
+		 fileList.getSelectedValue().rename(myName);
+		 House.findFile(fileList.getSelectedValue()).rename(myName);
+		 Room myRoom = (Room) roomBox.getSelectedItem();
+		 listModel.removeAllElements();
+	        for (HomeFile h : myRoom.getFiles()) {
+	        	listModel.addElement(h);
+	        }
+		 Room.saveRoom(House);
+		 House.printRoom();
+		 parentGUI.updateDisplay();
 	}
+	
 }
