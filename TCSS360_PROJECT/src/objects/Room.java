@@ -226,4 +226,19 @@ public class Room implements Serializable{
 			return myRoomName.equals(other.getRoomName());
 		}
 		
+		/**
+		 * Method for printing the structure of a room, mainly for dev use.
+		 * @author Romi Tshiorny
+		 */
+		public void printRoom() {
+			System.out.println(myRoomName +":");
+			for(Room r : mySubRooms) {
+				System.out.println(myRoomName +"->" + r.getRoomName() + ":");
+				r.printRoom();
+			}
+			for(HomeFile f: myFiles) {
+				System.out.println(myRoomName +"->" + f.getName());
+			}
+		}
+		
 }
