@@ -402,16 +402,18 @@ public class GUI extends JFrame{
 		roomBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox<?> box = (JComboBox<?>) e.getSource();
-		        myRoom = (Room) box.getSelectedItem();
-		        myFiles = myRoom.getFiles();
-		        myFile = null;
-		        updateDisplay();
-		        listModel.removeAllElements();
-		        for (HomeFile h : myRoom.getFiles()) {
-		        	listModel.addElement(h);
-		        }
-		        clearInfoArea();		        
+				if(House.getSubRooms().size() > 0) {
+					JComboBox<?> box = (JComboBox<?>) e.getSource();
+			        myRoom = (Room) box.getSelectedItem();
+			        myFiles = myRoom.getFiles();
+			        myFile = null;
+			        updateDisplay();
+			        listModel.removeAllElements();
+			        for (HomeFile h : myRoom.getFiles()) {
+			        	listModel.addElement(h);
+			        }
+			        clearInfoArea();	
+				}
 			}
         });
 		
@@ -696,7 +698,7 @@ public class GUI extends JFrame{
 					myRoom.addFile(newFile);
 					Room.saveRoom(House);
 					updateDisplay();
-					House.printRoom();
+					//House.printRoom();
 				}
 			}
 		}
@@ -744,8 +746,21 @@ public class GUI extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(myRoom != null) {
-				// Does not work
-				// House.removeRoom(((Room)roomBox.getSelectedItem()).toString());
+				String choiceButtons[] = {"Yes","No"};
+				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this Room?","Confirm Deletion",
+			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
+			    if (result == 0) {
+					//System.out.println("Removing " + ((Room)roomBox.getSelectedItem()).getRoomName());
+					House.removeRoom(((Room)roomBox.getSelectedItem()));
+					roomBox.removeItemAt(roomBox.getSelectedIndex());
+					myRoom = null;
+					if(House.getSubRooms().size() == 0) {
+						roomBox.setEnabled(false);
+					}
+					updateDisplay();
+					Room.saveRoom(House);
+					//House.printRoom();
+			    }
 			} 
 			else {
 				JOptionPane.showMessageDialog(myFrame,

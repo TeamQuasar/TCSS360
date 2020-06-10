@@ -140,7 +140,7 @@ public class FileName extends JFrame{
 	        	listModel.addElement(h);
 	        }
 		 Room.saveRoom(House);
-		 House.printRoom();
+		 //House.printRoom();
 		 parentGUI.updateDisplay();
 	}
 	
