@@ -220,4 +220,14 @@ public class HomeFile extends File implements Serializable
 		myFileNotes = theNote;
 	}
 	
+	/**
+	 * Method for renaming a file
+	 * @author Romi Tshiorny
+	 * @param theName new name
+	 */
+	public void rename(String theName) {
+		myFileName = theName;
+	}
+	
+	
 }
