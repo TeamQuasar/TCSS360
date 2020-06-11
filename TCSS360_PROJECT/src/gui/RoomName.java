@@ -7,12 +7,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -37,6 +39,12 @@ public class RoomName extends JFrame{
 	 */
 	private RoomName myFrame;
 	
+	
+	/**
+	 * Main GUI
+	 */
+	private GUI gui;
+	
 	/**
 	 * the Name that the room will be named
 	 */
@@ -49,7 +57,8 @@ public class RoomName extends JFrame{
 	/**
 	 * Method for starting the GUI
 	 */
-	public void start(JComboBox<Room> roomBox, Room House){
+	public void start(JComboBox<Room> roomBox, Room House, GUI mygui){
+		gui = mygui;
 		myFrame = new RoomName();
 		myFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		myFrame.setLayout(new BorderLayout());
@@ -72,11 +81,13 @@ public class RoomName extends JFrame{
 		JPanel mainPanel = new JPanel();
 		JPanel fieldPanel = new JPanel();
 		JPanel buttonPanel = new JPanel();
-		
+		JPanel label = new JPanel();
 		JTextField roomName = new JTextField();
 		JButton setButton = new JButton("Set Name");
 		JButton cancelButton = new JButton("Cancel");
 		
+		JLabel note = new JLabel("NOTICE: APPLICATION IS CLOSED WHEN ADDING A ROOM DUE TO BUG");
+		label.add(note);
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -110,6 +121,7 @@ public class RoomName extends JFrame{
 		
 		mainPanel.add(fieldPanel);
 		mainPanel.add(buttonPanel);
+		mainPanel.add(label);
 		
 		return mainPanel;
 	}
@@ -125,6 +137,12 @@ public class RoomName extends JFrame{
 		House.addRoom(newRoom.getRoomName());
 		roomBox.setEnabled(true);
 		Room.saveRoom(House);
-		House.printRoom();
+		try {
+			gui.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//House.printRoom();
 	}
 }

@@ -68,12 +68,21 @@ public class Room implements Serializable{
 		}
 		
 		/**
-		 * Method for deleting a room
+		 * Method for deleting a room using its name
 		 * @author Romi Tshiorny
 		 * @param theRoomName room to be deleted
 		 */
 		public void removeRoom(String theRoomName) {
 			mySubRooms.remove(new Room(theRoomName));
+		}
+		
+		/**
+		 * Method for deleting a room using another Room
+		 * @author Romi Tshiorny
+		 * @param theRoomName room to be deleted
+		 */
+		public void removeRoom(Room theRoom) {
+			mySubRooms.remove(theRoom);
 		}
 		
 		/**
