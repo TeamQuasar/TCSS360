@@ -60,6 +60,7 @@ public class Login extends JFrame {
 	public Login() {
 		super("HMP - Log in");
 		myManager = new AccountManager();
+		/** ENABLE TO CLEAR ALL USERS **/
 		//myManager.clearUsers();
 	}
 

@@ -152,8 +152,7 @@ public class CreateAcc extends JFrame{
 	private void create(final String username, final String password, UserSettings settings,
 												JButton login) {
 		if (myManager.createAccount(username, password)) {
-			myManager.getListOfUsers().get(myManager.getListOfUsers().size() - 1 )
-				.setSettings(settings);
+			myManager.getNewestUser().setSettings(settings);
 			JOptionPane.showMessageDialog(myFrame,
 					"Account Created!",
 					"Success", 

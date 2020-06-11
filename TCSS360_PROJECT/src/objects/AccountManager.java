@@ -33,6 +33,11 @@ public class AccountManager {
 	private User currentUser;
 	
 	/**
+	 * The Newest User
+	 */
+	private User newestUser;
+	
+	/**
 	 * Default constructor, pulls the list of users from a file via deserialize() method.
 	 * @author Romi Tshiorny
 	 */
@@ -108,12 +113,19 @@ public class AccountManager {
 			}
 		}
 		
+		User newUser;
+		
 		if(myUserList.size() == 0) {
-			myUserList.add(new User(theUsername,thePassword, true)); //First user made is always administrator
+			newUser = new User(theUsername,thePassword, true);
+			myUserList.add(newUser); //First user made is always administrator
+		
 		} 
 		else {
-			myUserList.add(new User(theUsername,thePassword));
+			newUser = new User(theUsername,thePassword);
+			myUserList.add(newUser);
 		}
+		
+		newestUser = newUser;
 		
 		serialize();
 		return true;
@@ -135,6 +147,14 @@ public class AccountManager {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Getter for the most recently added user
+	 * @return the most recently added user
+	 */
+	public User getNewestUser() {
+		return newestUser;
 	}
 	
 	/**

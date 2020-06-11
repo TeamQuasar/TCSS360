@@ -109,6 +109,7 @@ public class UsersWindow extends JFrame{
 		JLabel currentUser = new JLabel("Logged in as: " +
 				myManager.getCurrentUser().toString());
 		top.add(currentUser);
+		top.add(Box.createRigidArea(new Dimension(10, 0)));
 		return top;
 	}
 	
