@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -359,11 +362,51 @@ public class GUI extends JFrame{
 		top.add(roomPanel);
 		
 		top.add(Box.createRigidArea(new Dimension(0, 10)));
-		JTextArea searchBar = new JTextArea("Search");
+		JTextField searchBar = new JTextField("Search");
 		searchBar.setMaximumSize(new Dimension(194, 20));
 		searchBar.setMinimumSize(new Dimension(194, 20));
 		searchBar.setPreferredSize(new Dimension(194, 20));
 		top.add(searchBar);
+		
+		searchBar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (searchBar.getText() == "") {
+			        listModel.removeAllElements();
+			        for (HomeFile h : myRoom.getFiles()) {
+			        	listModel.addElement(h);
+			        }
+			        fileList.setSelectedIndex(0);
+			        updateDisplay();
+			        clearInfoArea();	
+				} else {
+					Set<HomeFile> s = House.filterFiles(searchBar.getText());
+					listModel.removeAllElements();
+			        for (HomeFile h : s) {
+			        	listModel.addElement(h);
+			        }
+			        fileList.setSelectedIndex(0);
+			        updateDisplay(s);
+			        clearInfoArea();
+				}
+			}
+		
+		});
+		
+		searchBar.addFocusListener(new FocusAdapter() {
+		    public void focusGained(FocusEvent e) {
+		        JTextField source = (JTextField) e.getComponent();
+		        if(source.getText().trim().equals("Search")) {
+		        	source.setText("");
+		    	}
+		    }
+		    public void focusLost(FocusEvent e) {
+		    	JTextField source = (JTextField) e.getComponent();
+		        if(source.getText().trim().equals("")) {
+		        	source.setText("Search");
+		    	}
+		    }
+		});
 		
 		listModel = new DefaultListModel<>();
 		fileList = new JList<HomeFile>(listModel);
@@ -629,6 +672,23 @@ public class GUI extends JFrame{
 		filesArea.repaint();
 		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
 	}
+	
+	/**
+	 * Updates the file display with a given set
+	 * @author Collin Nguyen
+	 */
+	public void updateDisplay(Set<HomeFile> theSet) {
+		filesArea.removeAll();
+		filesArea.revalidate();
+		filesArea.repaint();
+		for(HomeFile h : theSet) {
+			filesArea.add(generateFileButton(h));
+		}
+		filesArea.revalidate();
+		filesArea.repaint();
+		filesArea.setPreferredSize(new Dimension(600, 193*(myFiles.size()+2)/2));
+	}
+	
 	
 	
 	/**
