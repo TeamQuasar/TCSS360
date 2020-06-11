@@ -86,7 +86,7 @@ public class RoomName extends JFrame{
 		JButton setButton = new JButton("Set Name");
 		JButton cancelButton = new JButton("Cancel");
 		
-		JLabel note = new JLabel("NOTICE: APPLICATION IS CLOSED WHEN ADDING A ROOM DUE TO BUG");
+		JLabel note = new JLabel("NOTICE: PLEASE RESTART AFTER CREATING ROOM");
 		label.add(note);
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
