@@ -352,7 +352,7 @@ public class GUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				
 				RoomName getNameGUI = new RoomName();
-				getNameGUI.start(roomBox, House);
+				getNameGUI.start(roomBox, House, Self);
 			}
 		
 		});
@@ -794,6 +794,14 @@ public class GUI extends JFrame{
 					    JOptionPane.ERROR_MESSAGE);
 			}
 		}			
+	}
+	
+	/**
+	 * Method for closing the GUI
+	 * @throws IOException 
+	 */
+	public void close() throws IOException {
+		myFrame.dispatchEvent(new WindowEvent(myFrame, WindowEvent.WINDOW_CLOSING));
 	}
 	
 	/**
