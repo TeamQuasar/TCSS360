@@ -360,14 +360,16 @@ public class GUI extends JFrame{
 		
 		top.add(Box.createRigidArea(new Dimension(0, 10)));
 		JTextArea searchBar = new JTextArea("Search");
-		searchBar.setMaximumSize(new Dimension(194, 50));
-		searchBar.setMinimumSize(new Dimension(194, 50));
-		searchBar.setPreferredSize(new Dimension(194, 50));
+		searchBar.setMaximumSize(new Dimension(194, 20));
+		searchBar.setMinimumSize(new Dimension(194, 20));
+		searchBar.setPreferredSize(new Dimension(194, 20));
 		top.add(searchBar);
 		
 		listModel = new DefaultListModel<>();
 		fileList = new JList<HomeFile>(listModel);
 		fileList.setMaximumSize(new Dimension(194, 500));
+		fileList.setMinimumSize(new Dimension(194, 0));
+		fileList.setPreferredSize(new Dimension(194, 500));
 		middle.add(fileList);
 		
 		if(House.getSubRooms().size() == 0) {
@@ -402,18 +404,16 @@ public class GUI extends JFrame{
 		roomBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(House.getSubRooms().size() > 0) {
-					JComboBox<?> box = (JComboBox<?>) e.getSource();
-			        myRoom = (Room) box.getSelectedItem();
-			        myFiles = myRoom.getFiles();
-			        myFile = null;
-			        updateDisplay();
-			        listModel.removeAllElements();
-			        for (HomeFile h : myRoom.getFiles()) {
-			        	listModel.addElement(h);
-			        }
-			        clearInfoArea();	
-				}
+				JComboBox<?> box = (JComboBox<?>) e.getSource();
+		        myRoom = (Room) box.getSelectedItem();
+		        myFiles = myRoom.getFiles();
+		        myFile = null;
+		        updateDisplay();
+		        listModel.removeAllElements();
+		        for (HomeFile h : myRoom.getFiles()) {
+		        	listModel.addElement(h);
+		        }
+		        clearInfoArea();		        
 			}
         });
 		
@@ -698,7 +698,7 @@ public class GUI extends JFrame{
 					myRoom.addFile(newFile);
 					Room.saveRoom(House);
 					updateDisplay();
-					//House.printRoom();
+					House.printRoom();
 				}
 			}
 		}
@@ -746,21 +746,8 @@ public class GUI extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(myRoom != null) {
-				String choiceButtons[] = {"Yes","No"};
-				int result = JOptionPane.showOptionDialog(null,"Are you sure you want to delete this Room?","Confirm Deletion",
-			        		JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null, choiceButtons, choiceButtons[1]);
-			    if (result == 0) {
-					//System.out.println("Removing " + ((Room)roomBox.getSelectedItem()).getRoomName());
-					House.removeRoom(((Room)roomBox.getSelectedItem()));
-					roomBox.removeItemAt(roomBox.getSelectedIndex());
-					myRoom = null;
-					if(House.getSubRooms().size() == 0) {
-						roomBox.setEnabled(false);
-					}
-					updateDisplay();
-					Room.saveRoom(House);
-					//House.printRoom();
-			    }
+				// Does not work
+				// House.removeRoom(((Room)roomBox.getSelectedItem()).toString());
 			} 
 			else {
 				JOptionPane.showMessageDialog(myFrame,
@@ -816,4 +803,3 @@ public class GUI extends JFrame{
 	}
 	
 }
-

@@ -125,6 +125,6 @@ public class RoomName extends JFrame{
 		House.addRoom(newRoom.getRoomName());
 		roomBox.setEnabled(true);
 		Room.saveRoom(House);
-		//House.printRoom();
+		House.printRoom();
 	}
 }
